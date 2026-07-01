@@ -7,7 +7,7 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 
 export const AuthContext = createContext();
@@ -46,7 +46,23 @@ const AuthContextProvider = ({ children }) => {
   const AuthenticateUser = async (credentials) => {
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+      let email = credentials.email.trim();
+      
+      // If the user inputs a username (doesn't contain '@'), look up their email from Firestore
+      if (!email.includes('@')) {
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("username", "==", email));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          throw new Error("No user found with this username.");
+        }
+        
+        const userDoc = querySnapshot.docs[0];
+        email = userDoc.data().email;
+      }
+      
+      const userCredential = await signInWithEmailAndPassword(auth, email, credentials.password);
       const user = userCredential.user;
       const token = await user.getIdToken();
       

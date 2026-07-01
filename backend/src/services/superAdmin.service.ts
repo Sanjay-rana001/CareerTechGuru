@@ -1,11 +1,11 @@
-import AdminData from '../models/superAdmin.model';
+import { db } from '../Database';
 import { ICandidateData } from '../interfaces/superAdmin.interface';
 
 class SuperAdminServices {
     async getAllCandidatesDetails(): Promise<ICandidateData[]> {
         try {
-            const response = await AdminData.findAll();
-            return response.map(candidate => candidate.get({ plain: true }) as ICandidateData);
+            const snapshot = await db.collection('JobApplicants').get();
+            return snapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) })) as ICandidateData[];
         } catch (error) {
             console.error('Error fetching candidate details:', error);
             throw new Error('Unable to fetch candidate details');

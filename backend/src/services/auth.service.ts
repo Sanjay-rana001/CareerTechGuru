@@ -1,6 +1,6 @@
 import { IAuthUser, ILoginResponse, ILoginUser } from "../interfaces/auth.interface";
 import bcrypt from 'bcrypt';
-import AuthUser from "../models/auth.model";
+import { db } from '../Database';
 import jwt from 'jsonwebtoken';
 import { generate } from "otp-generator";
 import EmailVerificationProvider from "../config/email.config";
@@ -20,40 +20,45 @@ class AuthService {
     }
     async addUser(userDetails: IAuthUser): Promise<ILoginResponse | null> {
         try {
-            const existingUserWithEmail = await AuthUser.findOne({
-                where: { email: userDetails.email },
-            });
-    
-            if (existingUserWithEmail) {
+            const emailSnapshot = await db.collection('AuthUsers').where('email', '==', userDetails.email).limit(1).get();
+            if (!emailSnapshot.empty) {
                 return { message: 'Email already exists', loading: false, token: '', user: null };
             }
     
-            // Check if user with the provided mobile number already exists
-            const existingMobileUser = await AuthUser.findOne({ where: { mobile: userDetails.mobile } });
-            if (existingMobileUser) {
+            const mobileSnapshot = await db.collection('AuthUsers').where('mobile', '==', userDetails.mobile).limit(1).get();
+            if (!mobileSnapshot.empty) {
                 return { message: 'Mobile number already exists', loading: false, token: '', user: null };
             }
     
-            // Generate OTP
             const resetOtp = this.generateOtp();
             const otpExpiration = this.setOtpExpiration(10);
+            const hashedPassword = bcrypt.hashSync(userDetails.password, 10);
         
-            // Save user details along with OTP and expiration time
-            const newUser = await AuthUser.create({
+            const newUserData = {
                 ...userDetails,
+                password: hashedPassword,
                 otp: resetOtp,
-                otpExpiration: otpExpiration,
-            });
+                otpExpiration: otpExpiration.toISOString(),
+                isEmailVerified: false,
+                isMobileOtpVerified: false,
+                otpVerified: false,
+                emailResendOtp: false,
+                mobileResendOtp: false,
+                role: userDetails.role || 'user',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            const docRef = await db.collection('AuthUsers').add(newUserData);
+            const userResponse = { id: docRef.id, ...newUserData } as unknown as IAuthUser;
     
-            // Send OTP via email
             await EmailVerificationProvider(userDetails.email, resetOtp);
     
-            // Return a response indicating successful user creation
             return {
                 message: 'User added successfully',
                 loading: false,
-                token: '', // Assuming you handle token generation elsewhere
-                user: newUser.toJSON() as IAuthUser, // Convert the user to JSON format
+                token: '',
+                user: userResponse,
             };
         } catch (error) {
             console.error("Error adding user:", error);
@@ -62,25 +67,26 @@ class AuthService {
     }
     async verifyUserEmail(otpToken: string): Promise<ILoginResponse> {
         try {
-            // Find the user by OTP
-            const user = await AuthUser.findOne({ where: { otp: otpToken } });
-    
-            if (!user) {
+            const snapshot = await db.collection('AuthUsers').where('otp', '==', otpToken).limit(1).get();
+            if (snapshot.empty) {
                 return { message: 'User not found', loading: false, token: '', user: null };
             }
     
-            if (user.otpExpiration && new Date() > user.otpExpiration) {
+            const doc = snapshot.docs[0];
+            const userData = doc.data();
+
+            if (userData.otpExpiration && new Date() > new Date(userData.otpExpiration)) {
                 return { message: 'OTP has expired', loading: false, token: '', user: null };
             }
     
-            // Mark email as verified
-            user.otp = "";
-            user.isEmailVerified = true;
-            await user.save();
+            await doc.ref.update({
+                otp: "",
+                isEmailVerified: true,
+                updatedAt: new Date().toISOString()
+            });
     
-            // Generate JWT token
-            const token = jwt.sign({ id: user.id, email: user.email, role : user.role }, process.env.JWT_SECRET as string, { expiresIn: '48h' });
-            return { message: 'Email verified successfully', loading: false, token, user: user };
+            const token = jwt.sign({ id: doc.id, email: userData.email, role : userData.role }, process.env.JWT_SECRET as string, { expiresIn: '48h' });
+            return { message: 'Email verified successfully', loading: false, token, user: { id: doc.id, ...userData } as unknown as IAuthUser };
         } catch (error) {
             console.error('Error in verifying email:', error);
             return { message: 'Internal server error', loading: false, token: '', user: null };
@@ -89,25 +95,22 @@ class AuthService {
     async authenticateUser(loginCredentials: ILoginUser): Promise<ILoginResponse> {
         try {
             const { email, password } = loginCredentials;
+            const snapshot = await db.collection('AuthUsers').where('email', '==', email).limit(1).get();
 
-            // Check if the user exists with the provided email
-            const user = await AuthUser.findOne({ where: { email } });
-
-            if (!user) {
-                return { message: 'User not found', loading: false, token: '', user: user };
+            if (snapshot.empty) {
+                return { message: 'User not found', loading: false, token: '', user: null };
             }
 
-            // Verify the password
-            const isPasswordValid = await bcrypt.compare(password, user.password);
+            const doc = snapshot.docs[0];
+            const userData = doc.data();
 
+            const isPasswordValid = bcrypt.compareSync(password, userData.password);
             if (!isPasswordValid) {
                 return { message: 'Invalid password', loading: false, token: '', user: null };
             }
 
-            // If email and password are valid, generate JWT token
-            const token = jwt.sign({ id: user.id, email: user.email, role : user.role }, process.env.JWT_SECRET as string, { expiresIn: '48h' });
-
-            return { message: 'Login successful', loading: false, token, user: user.toJSON() as IAuthUser };
+            const token = jwt.sign({ id: doc.id, email: userData.email, role : userData.role }, process.env.JWT_SECRET as string, { expiresIn: '48h' });
+            return { message: 'Login successful', loading: false, token, user: { id: doc.id, ...userData } as unknown as IAuthUser };
         } catch (error) {
             console.error("Error authenticating user:", error);
             return { message: 'Internal server error', loading: false, token: '', user: null };
@@ -116,26 +119,22 @@ class AuthService {
 
     async forgotPassword(email: string): Promise<string> {
         try {
-            const user = await AuthUser.findOne({ where: { email } });
-
-            if (!user) {
+            const snapshot = await db.collection('AuthUsers').where('email', '==', email).limit(1).get();
+            if (snapshot.empty) {
                 return 'User not found';
             }
+            const doc = snapshot.docs[0];
 
-            // Generate a 6-digit OTP
             const resetOtp = this.generateOtp();
-
-            // Set OTP expiration time (e.g., 10 minutes from now)
             const otpExpiration = this.setOtpExpiration(10);
 
-            // Update user with the OTP and expiration
-            user.otp = resetOtp;
-            user.otpExpiration = otpExpiration;
-            await user.save();
+            await doc.ref.update({
+                otp: resetOtp,
+                otpExpiration: otpExpiration.toISOString(),
+                updatedAt: new Date().toISOString()
+            });
 
-            // Send OTP to user's email
             await EmailVerificationProvider(email, resetOtp);
-
             return 'OTP sent to email';
         } catch (error) {
             console.error('Error in forgot password:', error);
@@ -144,20 +143,26 @@ class AuthService {
     }
     async verifyOtpForPasswordReset(otp: string): Promise<string> {
         try {
-            const user = await AuthUser.findOne({ where: { otp } });
-            if (!user) {
+            const snapshot = await db.collection('AuthUsers').where('otp', '==', otp).limit(1).get();
+            if (snapshot.empty) {
                 return 'Invalid OTP';
             }
 
-            if (user.otpExpiration && new Date() > user.otpExpiration) {
+            const doc = snapshot.docs[0];
+            const userData = doc.data();
+
+            if (userData.otpExpiration && new Date() > new Date(userData.otpExpiration)) {
                 return 'OTP has expired';
             }
             console.log("this is ", otp)
-            const otpVerifiedExpiration = this.setOtpExpiration(10); // Set OTP verified state expiration
-            user.otp = "";
-            user.otpVerified = true;
-            user.otpExpiration = otpVerifiedExpiration;
-            await user.save();
+            const otpVerifiedExpiration = this.setOtpExpiration(10); 
+            
+            await doc.ref.update({
+                otp: "",
+                otpVerified: true,
+                otpExpiration: otpVerifiedExpiration.toISOString(),
+                updatedAt: new Date().toISOString()
+            });
 
             return 'OTP verified successfully';
         } catch (error) {
@@ -167,18 +172,25 @@ class AuthService {
     }
     async resetPassword(email: string, newPassword: string): Promise<string> {
         try {
-            const user = await AuthUser.findOne({ where: { email } });
-            if (!user) {
+            const snapshot = await db.collection('AuthUsers').where('email', '==', email).limit(1).get();
+            if (snapshot.empty) {
                 return 'User not found';
             }
 
-            if (!user.otpVerified) { 
+            const doc = snapshot.docs[0];
+            const userData = doc.data();
+
+            if (!userData.otpVerified) { 
                 return 'OTP verification required';
             }
 
-            user.password = newPassword;
-            user.otpVerified = false; // Reset OTP verification flag
-            await user.save();
+            const hashedPassword = bcrypt.hashSync(newPassword, 10);
+            
+            await doc.ref.update({
+                password: hashedPassword,
+                otpVerified: false,
+                updatedAt: new Date().toISOString()
+            });
 
             return 'Password reset successfully';
         } catch (error) {

@@ -1,9 +1,14 @@
-import { element } from "prop-types";
-import { AddJobForm, AppliedJobs, CategorySectionTab, ViewCategory } from "../features";
-import {AdminHome, EmployeeAppliedJobs} from '../pages'
-import ViewJob from "../features/job/components/ViewJob";
-import { Dashboard, EmployeeProfile } from "../shared";
-import { EmployerProfile } from "../shared/employerPages";
+import React from "react";
+
+const CategorySectionTab = React.lazy(() => import("../features/category/CategorySectionTab"));
+const AddJobForm = React.lazy(() => import("../features/job/AddJobForm"));
+const ViewCategory = React.lazy(() => import("../features/category/components/ViewCategory"));
+const EmployerProfile = React.lazy(() => import("../shared/employerPages/components/EmployerProfile"));
+const ViewJob = React.lazy(() => import("../features/job/components/ViewJob"));
+
+const EmployeeProfile = React.lazy(() => import("../shared/employee/components/EmployeeProfile"));
+const EmployeeAppliedJobs = React.lazy(() => import("../pages/Employee/EmployeeAppliedJobs"));
+const AdminHome = React.lazy(() => import("../pages/adminPages/AdminHome"));
 
 export const employerRoutes = [
     {

@@ -79,7 +79,7 @@ const Login = () => {
                 Username or Email <sup className="text-red-500">*</sup>
               </label>
               <TextInput 
-                type="email" 
+                type="text" 
                 name="email" 
                 value={loginCredentials.email} 
                 onChange={handleInputChange} 
@@ -87,7 +87,7 @@ const Login = () => {
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
               />
               {formError.email && (
-                <span className="text-xs font-medium text-red-500">Email is required</span>
+                <span className="text-xs font-medium text-red-500">Username or Email is required</span>
               )}
             </div>
 
@@ -146,7 +146,7 @@ const Login = () => {
           <div className="mt-6 pt-6 border-t border-slate-100 space-y-2.5 text-xs text-center">
             <p className="mb-0 text-slate-500">
               <Link to='/forgot-password' className="text-[#2563EB] font-medium no-underline hover:underline">
-                Dont't remember your password ? Forgot your password
+                Forgot Password?
               </Link>
             </p>
             <p className="mb-0 text-slate-500">
@@ -156,8 +156,8 @@ const Login = () => {
               </Link>
             </p>
             <p className="mb-0">
-              <Link className="text-slate-400 no-underline hover:underline">
-                Need help in siging in ?
+              <Link to="/contact-us" className="text-slate-400 no-underline hover:underline">
+                Need help signing in?
               </Link>
             </p>
           </div>

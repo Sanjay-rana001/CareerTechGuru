@@ -3,6 +3,7 @@ import { convertTimeIntoMMYYYY } from '../../../utils/dateFilter/DateFilter';
 import { FaBook, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { TbWorldWww  } from 'react-icons/tb';
+import { VscLinkExternal } from 'react-icons/vsc';
 import UpdateInput from '../../../components/modal/UpdateInput';
 import { ModalBox } from '../../../components';
 import axios from 'axios';

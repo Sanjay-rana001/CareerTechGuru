@@ -1,9 +1,15 @@
-import { Aboutus, AllJobs, JobDetailPage, ContactUs } from "../pages";
-import { ForgotPassword, Login, ResetPassword,Signup, VerifyOtp } from "../shared";
-import EmailVerify from "../shared/auth/signup/EmailVerify";
-import FormStepOne from "../shared/auth/signup/FormStepOne";
-import FormStepTwo from "../shared/auth/signup/FormStepTwo";
-// import ContactUs from "../pages/ContactUs"
+import React from 'react';
+
+const Login = React.lazy(() => import('../shared/auth/Login'));
+const Signup = React.lazy(() => import('../shared/auth/signup/Signup'));
+const ForgotPassword = React.lazy(() => import('../shared/auth/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('../shared/auth/ResetPassword'));
+const VerifyOtp = React.lazy(() => import('../shared/auth/VerifyOtp'));
+
+const Aboutus = React.lazy(() => import('../pages/Aboutus'));
+const AllJobs = React.lazy(() => import('../pages/AllJobs'));
+const JobDetailPage = React.lazy(() => import('../pages/JobDetailPage'));
+const ContactUs = React.lazy(() => import('../pages/ContactUs'));
 
 export const authRoutes = [
     {path : "/login", element : <Login />},

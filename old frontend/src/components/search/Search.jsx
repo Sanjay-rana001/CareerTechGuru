@@ -8,6 +8,7 @@ const Search = ({ categories }) => {
   const { searchJobQuery, getJobSingleDetail } = useJobContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [locations, setLocations] = useState([]);
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [location, setLocation] = useState(searchParams.get('jobLocation') || '');

@@ -56,7 +56,7 @@ class ProductController {
     async getJobApplicationByJobId(req: Request, res: Response): Promise<void> {
         const { id } = req.params;
 
-        if (!Types.ObjectId.isValid(id)) {
+        if (!id || typeof id !== 'string') {
             res.status(400).json({ message: 'Invalid product ID' });
             return;
         }

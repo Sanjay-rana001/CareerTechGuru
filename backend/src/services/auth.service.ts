@@ -50,7 +50,7 @@ class AuthService {
             };
 
             const docRef = await db.collection('AuthUsers').add(newUserData);
-            const userResponse = { id: docRef.id, ...newUserData } as unknown as IAuthUser;
+            const userResponse = { ...newUserData, id: docRef.id } as unknown as IAuthUser;
     
             await EmailVerificationProvider(userDetails.email, resetOtp);
     

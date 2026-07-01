@@ -1,4 +1,5 @@
-import * as admin from 'firebase-admin';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 import log from "./utils/logger";
 import fs from 'fs';
@@ -6,7 +7,7 @@ import path from 'path';
 
 dotenv.config();
 
-let db: admin.firestore.Firestore;
+let db: Firestore;
 
 const Connection = async (): Promise<void> => {
     try {
@@ -18,11 +19,11 @@ const Connection = async (): Promise<void> => {
 
         const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
 
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
+        initializeApp({
+            credential: cert(serviceAccount)
         });
 
-        db = admin.firestore();
+        db = getFirestore();
         log.info("Connected to Firebase Firestore");
     } catch (error) {
         console.error('Error connecting to Firebase:', error);

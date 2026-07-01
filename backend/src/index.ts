@@ -16,38 +16,32 @@ import { superAdminRoutes } from './routes/superAdmin.routes';
 
 type ErrorHandler = (err : Error, req : Request, res : Response, next : NextFunction) => void;
 
-const initializeServer = async():Promise<void> => {
-    dotenv.config();
-    const port: string = `${process.env.PORT}`;
-    const app : Application = express();
+dotenv.config();
 
-    app.use(CorsConfig);
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded(
-        {
-            extended : true
-        }
-    ));
-    app.use('/api/v1/auth',authRoutes);
-    app.use('/api/v1/admin', adminRoutes)
-    app.use('/api/v1/job', productRoutes);
-    app.use('/api/v1/user', userRoutes)
-    app.use('/api/v1/category', categoryRoutes);
-    app.use('/api/v1/manage', superAdminRoutes)
-    app.use('/api/v1/contact-us', contactUsQueries)
+const app : Application = express();
+app.use(CorsConfig);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended : true }));
 
-    try {
-        await Connection()
-        const server: http.Server = http.createServer(app);
+app.use('/api/v1/auth',authRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/job', productRoutes);
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/category', categoryRoutes);
+app.use('/api/v1/manage', superAdminRoutes);
+app.use('/api/v1/contact-us', contactUsQueries);
 
-        server.listen(port, (): void => {
-            log.info(`Server is running on http://localhost:${port}`)
-        })
-    } catch (error) {
-        console.error('Failed to connect to Firebase:', error);
-        process.exit(1);
-    }
+// Initialize DB connection
+Connection().catch((error) => {
+    console.error('Failed to connect to Firebase:', error);
+});
 
-};
+const port = process.env.PORT || 8000;
 
-initializeServer();
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+        log.info(`Server is running on http://localhost:${port}`);
+    });
+}
+
+export default app;

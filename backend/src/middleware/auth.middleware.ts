@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import AuthUser from '../models/auth.model';
+import { db } from '../Database';
 import { IJwtPayload } from '../interfaces/auth.interface';
 
 dotenv.config();
@@ -24,9 +24,9 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as IJwtPayload;
 
-        const user = await AuthUser.findByPk(decoded.id);
+        const userDoc = await db.collection('AuthUsers').doc(decoded.id).get();
 
-        if (!user) {
+        if (!userDoc.exists) {
             return res.status(401).json({ success: false, message: 'Invalid token: User not found' });
         }
 

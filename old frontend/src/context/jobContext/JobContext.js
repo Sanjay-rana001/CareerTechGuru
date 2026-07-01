@@ -1,96 +1,134 @@
-import React, { createContext, useEffect, useId, useState } from 'react';
-import axios from 'axios';
-import { DELETE_APPLICATION_BY_ID, FETCH_JOB_COMPANY, FETCH_JOB_SINGLE_DATA, SEARCH_APPLICATION_QUERY, addJobUrl, deleteProductById, fetchAllApplications, fetchAllProductByAdminId, fetchAllProductByUserId, fetchAllProducts, fetchApplicationByJobId } from '../../api/Api';
-import { toast } from "react-hot-toast";
-import { buildParams } from '../../utils/query/BuildQuery';
+import React, { createContext } from 'react';
+import { db, auth } from '../../firebase';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  getDoc, 
+  doc, 
+  deleteDoc, 
+  query, 
+  where 
+} from 'firebase/firestore';
+import { toast } from 'react-hot-toast';
 
 export const JobContext = createContext();
 
 const JobContextProvider = ({ children }) => {
   
   const addJobData = async (data) => {
-    const token = sessionStorage.getItem('token')
     try {
-      const response = await axios.post(addJobUrl, data, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      toast.success("job added successfully");
-      console.log('Response:', response?.data?.data);
-      return response.data; // Return response data if needed
+      const user = auth.currentUser;
+      const jobData = {
+        ...data,
+        postedBy: user ? user.uid : 'anonymous',
+        createdAt: new Date().toISOString()
+      };
+      const docRef = await addDoc(collection(db, "jobs"), jobData);
+      toast.success("Job added successfully");
+      return { id: docRef.id, ...jobData };
     } catch (error) {
-      // Handle error appropriately
       console.error('Error adding job:', error.message);
-      // You might want to throw the error to handle it in the calling component
       throw error;
     }
   };
+
   const getAllApplications = async () => {
     try {
-      const response = await axios.get(fetchAllApplications);
-      const data = response?.data;
-      return data;
+      const querySnapshot = await getDocs(collection(db, "jobs"));
+      const jobs = [];
+      querySnapshot.forEach((doc) => {
+        jobs.push({ _id: doc.id, id: doc.id, ...doc.data() });
+      });
+      return { data: jobs };
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching all applications/jobs:", error);
+      return { data: [] };
     }
   };
 
   const getApplicationsByAdminId = async (adminID) => {
     try {
-      const token = sessionStorage.getItem('token'); // Replace with your actual token
-      const response = await axios.get(`${fetchAllProductByAdminId}/${adminID}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      const q = query(collection(db, "jobs"), where("postedBy", "==", adminID));
+      const querySnapshot = await getDocs(q);
+      const jobs = [];
+      querySnapshot.forEach((doc) => {
+        jobs.push({ _id: doc.id, id: doc.id, ...doc.data() });
       });
-      const data = response?.data?.data;
-      return data;
+      return jobs;
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching jobs by admin ID:", error);
+      return [];
     }
   };
 
   const getApplicationsByJobId = async (id) => {
     try {
-      const response = await axios.get(`${fetchApplicationByJobId}/${id}`);
-      const data = response?.data;
-      return data;
+      const q = query(collection(db, "applications"), where("jobId", "==", id));
+      const querySnapshot = await getDocs(q);
+      const apps = [];
+      querySnapshot.forEach((doc) => {
+        apps.push({ id: doc.id, ...doc.data() });
+      });
+      return { data: apps };
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching applications by job ID:", error);
+      return { data: [] };
     }
   };
 
   const deleteJobById = async (id) => {
     try {
-      const token = sessionStorage.getItem('token'); // Replace with your actual token
-      const response = await axios.delete(`${DELETE_APPLICATION_BY_ID}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      toast.success("deleted successfully")
-      return response;
+      await deleteDoc(doc(db, "jobs", id));
+      toast.success("Deleted successfully");
+      return { status: 200 };
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting job:", error);
+      return null;
     }
-  }
+  };
 
-  const searchJobQuery = async (params) => {
+  const searchJobQuery = async (paramsString) => {
     try {
-      console.log(`${SEARCH_APPLICATION_QUERY}?${params}`)
-      const response = await axios.get(`${SEARCH_APPLICATION_QUERY}?${params}`);
-      return response.data;
+      const params = new URLSearchParams(paramsString);
+      let q = collection(db, "jobs");
+      const constraints = [];
+      
+      const category = params.get("category");
+      const location = params.get("jobLocation");
+      const experience = params.get("experience");
+      
+      if (category) constraints.push(where("category", "==", category));
+      if (location) constraints.push(where("location", "==", location));
+      if (experience) constraints.push(where("experience", "==", experience));
+      
+      if (constraints.length > 0) {
+        q = query(q, ...constraints);
+      }
+      
+      const querySnapshot = await getDocs(q);
+      const jobs = [];
+      querySnapshot.forEach((doc) => {
+        jobs.push({ _id: doc.id, id: doc.id, ...doc.data() });
+      });
+      return { data: jobs };
     } catch (error) {
       console.error("Error searching jobs:", error.message);
-      throw error;
+      return { data: [] };
     }
   };
 
   const getCompanyList = async () => {
     try {
-      const response = await axios.get(FETCH_JOB_COMPANY);
-      return response.data;
+      const querySnapshot = await getDocs(collection(db, "jobs"));
+      const companies = new Set();
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.company) {
+          companies.add(data.company);
+        }
+      });
+      return Array.from(companies).map(company => ({ label: company, value: company }));
     } catch (error) {
       console.error('Error fetching company list:', error);
       return [];
@@ -99,13 +137,22 @@ const JobContextProvider = ({ children }) => {
 
   const getJobSingleDetail = async () => {
     try {
-      const response = await axios.get(FETCH_JOB_SINGLE_DATA);
-      return response;  // Return only the data part of the response
+      const querySnapshot = await getDocs(collection(db, "jobs"));
+      const locations = new Set();
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.location) {
+          locations.add(data.location);
+        }
+      });
+      const uniqueLocations = Array.from(locations).map(loc => ({ label: loc, value: loc }));
+      return { data: uniqueLocations };
     } catch (error) {
-      console.error('Error fetching job single detail:', error);
-      throw error;  // Re-throw the error to handle it further up the call stack
+      console.error('Error fetching job single detail (locations):', error);
+      return { data: [] };
     }
-  }
+  };
+
   return (
     <JobContext.Provider value={{ 
       addJobData,
@@ -116,7 +163,7 @@ const JobContextProvider = ({ children }) => {
       searchJobQuery,
       getCompanyList,
       getJobSingleDetail
-       }}>
+    }}>
       {children}
     </JobContext.Provider>
   )

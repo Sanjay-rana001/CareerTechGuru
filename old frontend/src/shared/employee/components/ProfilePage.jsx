@@ -6,8 +6,9 @@ import { TbWorldWww  } from 'react-icons/tb';
 import { VscLinkExternal } from 'react-icons/vsc';
 import UpdateInput from '../../../components/modal/UpdateInput';
 import { ModalBox } from '../../../components';
-import axios from 'axios';
-import { resumeUpload } from '../../../api/Api';
+import { storage, db, auth } from '../../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, setDoc } from 'firebase/firestore';
 
 const ProfilePage = ({ data }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -32,32 +33,29 @@ const ProfilePage = ({ data }) => {
       return;
     }
   
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('email', data?.email);
-  
     try {
-      await axios.post(resumeUpload, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-  
+      const currentUser = auth.currentUser;
+      const userEmail = data?.email || (currentUser ? currentUser.email : null);
+      if (!userEmail) {
+        setErrorMessage('User email not found. Please log in again.');
+        return;
+      }
+
+      // 1. Upload file to Firebase Storage under resumes/email/filename
+      const storageRef = ref(storage, `resumes/${userEmail}/${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // 2. Update resumeUrl in the user's Firestore profile
+      const profileRef = doc(db, "profiles", userEmail);
+      await setDoc(profileRef, { resumeUrl: downloadURL }, { merge: true });
+
       setSuccessMessage('File uploaded successfully.');
       alert('File uploaded successfully.');
       window.location.reload();
     } catch (error) {
-      if (error.response) {
-        if (error.response.data && error.response.data.message) {
-          setErrorMessage(error.response.data.message);
-        } else {
-          setErrorMessage(`Error: ${error.response.status} - ${error.response.statusText}`);
-        }
-      } else if (error.request) {
-        setErrorMessage('No response from the server. Please try again later.');
-      } else {
-        setErrorMessage('Error in setting up the request: ' + error.message);
-      }
+      console.error('Error uploading resume:', error);
+      setErrorMessage('Error in setting up the request: ' + error.message);
     }
   };
 

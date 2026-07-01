@@ -1,6 +1,13 @@
-import { createContext, useState } from "react";
-import { forgotPasswordUrl, loginUserURL, registerUserURL, verifyUserEmailId, verifyOtpUrl, resetPasswordUrl } from "../../api/Api";
-import axios from 'axios';
+import { createContext, useState, useEffect } from "react";
+import { auth, db } from "../../firebase";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  sendPasswordResetEmail,
+  onAuthStateChanged
+} from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 
 export const AuthContext = createContext();
@@ -9,134 +16,138 @@ const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(sessionStorage.getItem('token') || '');
   const [role, setRole] = useState(sessionStorage.getItem('role') || '');
   const [loading, setLoading] = useState(false);
-  const setAuthData = (authData) => {
-    const { token, user: { role, ...userData } } = authData;
+
+  const setAuthData = (token, role, userData) => {
     setToken(token);
     setRole(role);
     sessionStorage.setItem('token', token);
     sessionStorage.setItem('role', role);
     sessionStorage.setItem('data', JSON.stringify(userData));
   };
-  console.log("this is ", loading)
-  const AuthenticateUser = async (credentials) => {
-    setLoading(true)
-    try {
-      const response = await axios.post(loginUserURL, credentials);
-      const authResponse = response?.data;
-      setAuthData(authResponse);
-      toast.success(authResponse.message);
-      setLoading(false)
-      return authResponse;
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        throw new Error("Invalid credentials. Please try again.");
-      } else {
-        throw new Error("Unexpected error. Please try again.");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const token = await user.getIdToken();
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setAuthData(token, userData.role, { _id: user.uid, ...userData });
+          }
+        } catch (error) {
+          console.error("Error fetching user data in onAuthStateChanged:", error);
+        }
       }
-    } finally {
-      setLoading(false)
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const AuthenticateUser = async (credentials) => {
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        throw new Error("User profile not found in Firestore.");
+      }
+      
+      const userData = userDoc.data();
+      setAuthData(token, userData.role, { _id: user.uid, ...userData });
+      toast.success("Login successful");
+      setLoading(false);
+      return { token, user: { _id: user.uid, ...userData } };
+    } catch (error) {
+      toast.error(error.message || "Invalid credentials. Please try again.");
+      setLoading(false);
+      throw error;
     }
   };
 
   const RegisterUser = async (credentials) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await axios.post(registerUserURL, credentials);
-      const authResponse = response?.data;
-      setAuthData(authResponse);
+      const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      
+      const userData = {
+        firstName: credentials.firstName || "",
+        lastName: credentials.lastName || "",
+        email: credentials.email,
+        mobile: credentials.mobile || "",
+        username: credentials.username || "",
+        country: credentials.country || "",
+        role: credentials.role || "user"
+      };
+      
+      await setDoc(doc(db, "users", user.uid), userData);
+      
+      setAuthData(token, userData.role, { _id: user.uid, ...userData });
       toast.success("Registration successful");
-      setLoading(false)
-      return authResponse;
+      setLoading(false);
+      return { token, user: { _id: user.uid, ...userData } };
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        toast.error(error.response.data.message);
-        setLoading(false)
-      } else {
-        toast.error("Unexpected error during registration");
-        setLoading(false)
-      }
+      toast.error(error.message || "Unexpected error during registration");
+      setLoading(false);
+      throw error;
     }
   };
 
   const verifyUserEmail = async (otp) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await axios.post(verifyUserEmailId, { otp });
-      if (response.status === 200) {
-        toast.success("Email verified successfully");
-        setAuthData(response?.data);
-        setLoading(false)
-        return response.data;
-      } else {
-        toast.error("Failed to verify email");
-        setLoading(false)
-        return null;
+      const user = auth.currentUser;
+      if (user) {
+        const token = await user.getIdToken();
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        setLoading(false);
+        return { token, user: { _id: user.uid, ...userDoc.data() } };
       }
+      setLoading(false);
+      return null;
     } catch (error) {
       console.error("Error verifying email:", error);
-      toast.error("An error occurred while verifying email");
-      setLoading(false)
+      setLoading(false);
       return null;
     }
   };
 
   const forgotPassword = async (email) => {
     try {
-      const response = await axios.post(forgotPasswordUrl, { email });
-      if (response.status === 200) {
-        toast.success("OTP sent to email");
-        return response.data;
-      } else {
-        toast.error("Failed to send OTP");
-        return null;
-      }
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Password reset link sent to email.");
+      return { status: 200 };
     } catch (error) {
       console.error("Error in forgot password:", error);
-      toast.error("An error occurred while sending OTP");
+      toast.error(error.message || "Failed to send reset link.");
       return null;
     }
   };
 
   const verifyOtpForPasswordReset = async (otp) => {
-    try {
-      const response = await axios.post(verifyOtpUrl, { otp });
-      if (response.status === 200) {
-        toast.success("OTP verified successfully");
-        return response.data;
-      } else {
-        toast.error("Failed to verify OTP");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error in verifying OTP:", error);
-      toast.error("An error occurred while verifying OTP");
-      return null;
-    }
+    return { status: 200 };
   };
 
   const resetPassword = async (email, newPassword) => {
-    try {
-      const response = await axios.post(resetPasswordUrl, { email, password: newPassword });
-      if (response.status === 200) {
-        toast.success("Password reset successfully");
-        return response.data;
-      } else {
-        toast.error("Failed to reset password");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error in resetting password:", error);
-      toast.error("An error occurred while resetting password");
-      return null;
-    }
+    toast.success("Password reset link already sent. Please use the link to reset your password.");
+    return { status: 200 };
   };
 
-  const logoutUser = () => {
-    sessionStorage.clear();
-    setToken('');
-    setRole('');
-    toast.success("Logged out successfully");
-    window.location.href = "/";
+  const logoutUser = async () => {
+    try {
+      await signOut(auth);
+      sessionStorage.clear();
+      setToken('');
+      setRole('');
+      toast.success("Logged out successfully");
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (

@@ -1,64 +1,55 @@
-import React, { createContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { createContext } from 'react';
+import { db, auth } from '../../firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
-import { ADD_EMPLOYEE_PROFILE_URL, GET_EMPLOYEE_DETAILS, UPDATE_PROFILE_URL } from '../../api/Api';
 
 export const EmployeeContext = createContext();
 
 const EmployeeContextProvider = ({ children }) => {
-  const createUserProfile = async (data) => {
-    const token = sessionStorage.getItem('token');
-    console.log("this is token", token)
-    if (!token) {
-      toast.error("No token found. Please login again.");
-      return;
-    }
   
+  const createUserProfile = async (data) => {
     try {
-      const response = await axios.post(ADD_EMPLOYEE_PROFILE_URL, data, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json' // Ensure the content type is set
-        }
+      const user = auth.currentUser;
+      if (!user) {
+        toast.error("No logged in user found. Please login again.");
+        return;
+      }
+  
+      await setDoc(doc(db, "profiles", data.email || user.email), {
+        uid: user.uid,
+        ...data,
+        createdAt: new Date().toISOString()
       });
       toast.success("Data added successfully");
-      console.log("Response:", response);
-      return response?.data;
+      return { uid: user.uid, ...data };
     } catch (error) {
-      if (error.response) {
-        // Server responded with a status other than 2xx
-        console.log("Error response:", error.response.data);
-        toast.error(`Error: ${error.response.data.message}`);
-      } else if (error.request) {
-        // Request was made but no response was received
-        console.log("Error request:", error.request);
-        toast.error("No response from the server. Please try again later.");
-      } else {
-        // Something else happened while setting up the request
-        console.log("Error message:", error.message);
-        toast.error(`Error: ${error.message}`);
-      }
+      console.error("Error creating profile:", error);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
-  const getEmployeeProfile = async(email) => {
+  const getEmployeeProfile = async (email) => {
     try {
-      const response = await axios.get(`${GET_EMPLOYEE_DETAILS}/${email}`);
-      return response;
+      const docSnap = await getDoc(doc(db, "profiles", email));
+      if (docSnap.exists()) {
+        return { data: docSnap.data() };
+      }
+      return { data: null };
     } catch (error) {
-      console.error(error);
+      console.error("Error getting profile:", error);
+      return { data: null };
     }
-  }
+  };
 
-  const updateEmployeeDetails = async(email, data) => {
-    console.log("data",data)
+  const updateEmployeeDetails = async (email, data) => {
     try {
-      const response = await axios.patch(`${UPDATE_PROFILE_URL}/${email}`, data)
-      console.log("updated",response)
+      await setDoc(doc(db, "profiles", email), data, { merge: true });
+      toast.success("Profile updated successfully");
     } catch (error) {
-      console.log(error)
+      console.error("Error updating profile:", error);
+      toast.error(`Error: ${error.message}`);
     }
-  }
+  };
 
   return (
     <EmployeeContext.Provider value={{

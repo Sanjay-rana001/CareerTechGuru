@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useEmployeeContext, useSectionContext } from '../../../context';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { jobType, locations } from '../../../testData/StaticData';
-import axios from 'axios';
-import { resumeUpload } from '../../../api/Api';
+import { storage } from '../../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const EmployeeProfileForm = () => {
     const { createUserProfile, updateEmployeeDetails } = useEmployeeContext();
@@ -189,39 +189,21 @@ const EmployeeProfileForm = () => {
                 const result = await createUserProfile(values);
                 if (result) {
                     console.log("User profile created successfully", result);
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('email', values.email);
-
-                    const resumeResponse = await axios.post(resumeUpload, formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-
-                    const resumeUrl = resumeResponse.data.resumeUrl;
-                    const updatedValues = { ...values, resumeUrl };
                     
-                    // Fixed argument call to updateEmployeeDetails
-                    await updateEmployeeDetails(values.email, { key: 'resumeUrl', value: resumeUrl });
-                    console.log("Profile updated with resume URL", updatedValues);
+                    const storageRef = ref(storage, `resumes/${values.email}/${file.name}`);
+                    const snapshot = await uploadBytes(storageRef, file);
+                    const downloadURL = await getDownloadURL(snapshot.ref);
+
+                    await updateEmployeeDetails(values.email, { resumeUrl: downloadURL });
+                    console.log("Profile updated with resume URL", downloadURL);
 
                     setSuccessMessage('Profile and resume uploaded successfully.');
                     navigate("/");
                 }
             }
         } catch (error) {
-            if (error.response) {
-                if (error.response.data && error.response.data.message) {
-                    setErrorMessage(error.response.data.message);
-                } else {
-                    setErrorMessage(`Error: ${error.response.status} - ${error.response.statusText}`);
-                }
-            } else if (error.request) {
-                setErrorMessage('No response from the server. Please try again later.');
-            } else {
-                setErrorMessage('Error in setting up the request: ' + error.message);
-            }
+            console.error('Error uploading profile/resume:', error);
+            setErrorMessage('Error in setting up the request: ' + error.message);
         }
     };
 

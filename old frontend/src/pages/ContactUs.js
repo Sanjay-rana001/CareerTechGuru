@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import './ContactUs.css';
 import logo from '../assets/phone-call.png';
 import web from '../assets/domain.png';
 import mail from '../assets/email.png';
 import address from '../assets/location.png';
-import { contactUsQueries } from '../api/Api';
 import { TextInput } from "../components"; // Ensure you have this import path correct
  
 const ContactUs = () => {
@@ -48,7 +48,10 @@ const ContactUs = () => {
     }
  
     try {
-      await axios.post(contactUsQueries, inputs);
+      await addDoc(collection(db, "contact_queries"), {
+        ...inputs,
+        submittedAt: new Date().toISOString()
+      });
       alert('Your query has been submitted successfully.');
       setInputs({
         name: '',
@@ -57,13 +60,8 @@ const ContactUs = () => {
         description: ''
       });
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.error) {
-        // Display the error message from the server
-        alert(error.response.data.error);
-      } else {
-        // Display a generic error message if something else went wrong
-        alert('There was an error submitting the form!');
-      }
+      console.error("Error submitting query to Firestore:", error);
+      alert('There was an error submitting the form!');
     }
   };
  

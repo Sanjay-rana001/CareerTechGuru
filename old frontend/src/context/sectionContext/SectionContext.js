@@ -1,6 +1,6 @@
-import React, { createContext, useEffect, useState } from 'react';
-import axios from 'axios';
-import { ADD_CATEGORY_URL, fetchAllSectionsUrl, fetchSectionsByIdEndpoint } from '../../api/Api';
+import React, { createContext, useState } from 'react';
+import { db } from '../../firebase';
+import { collection, addDoc, getDocs, doc, getDoc } from 'firebase/firestore';
 import { toast } from "react-hot-toast";
 
 export const SectionContext = createContext();
@@ -10,42 +10,50 @@ const SectionContextProvider = ({ children }) => {
 
     const addSectionData = async(data) =>  {
       try {
-        const response = await axios.post(ADD_CATEGORY_URL, data);
+        const docRef = await addDoc(collection(db, "sections"), {
+          ...data,
+          createdAt: new Date().toISOString()
+        });
         toast.success("section added successfully");
-        return response;
+        return { data: { id: docRef.id, ...data } };
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
+    };
     
     const getAllSections = async() => {
         try {
-            const response = await axios.get(fetchAllSectionsUrl);
-            return response?.data
+            const querySnapshot = await getDocs(collection(db, "sections"));
+            const items = [];
+            querySnapshot.forEach((doc) => {
+              items.push({ id: doc.id, _id: doc.id, ...doc.data() });
+            });
+            return { data: items };
         } catch (error) {
             console.log(error);
+            return { data: [] };
         }
-    }
+    };
 
     const getJobSectionById = async (id) => {
       try {
-        const response = await axios.get(`${fetchSectionsByIdEndpoint}/${id}`);
-        if (response) {
-          return response?.data?.items;
+        const docSnap = await getDoc(doc(db, "sections", id));
+        if (docSnap.exists()) {
+          return [{ id: docSnap.id, _id: docSnap.id, ...docSnap.data() }];
         } else {
-          console.log('Response data does not have an items property');
           return [];
         }
       } catch (error) {
         console.log(error);
         return [];
       }
-    }
+    };
+
   return (
-    <SectionContext.Provider value={{getAllSections, addSectionData, getJobSectionById }}>
+    <SectionContext.Provider value={{ getAllSections, addSectionData, getJobSectionById }}>
       {children}
     </SectionContext.Provider>
-  )
-}
+  );
+};
 
 export default SectionContextProvider;

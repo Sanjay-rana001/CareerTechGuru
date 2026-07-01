@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { SelectInput, TextInput } from '../../../components';
 import { GetCountries } from 'react-country-state-city';
 import { useAuthContext } from '../../../context';
-import axios from 'axios';
-import { resumeUpload } from '../../../api/Api';
+import { storage } from '../../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSubmit }) => {
   const { loading } = useAuthContext();
@@ -77,30 +77,22 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
       return;
     }
  
-    const formDataa = new FormData();
-    formDataa.append('file', file);
-    formDataa.append('email', formData.email);
- 
     try {
-      const response = await axios.post(resumeUpload, formDataa, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setSuccessMessage('File uploaded successfully.');
-      console.log(response.data);
-    } catch (error) {
-      if (error.response) {
-        if (error.response.data && error.response.data.message) {
-          setErrorMessage(error.response.data.message);
-        } else {
-          setErrorMessage(`Error: ${error.response.status} - ${error.response.statusText}`);
-        }
-      } else if (error.request) {
-        setErrorMessage('No response from the server. Please try again later.');
-      } else {
-        setErrorMessage('Error in setting up the request: ' + error.message);
+      if (!formData.email) {
+        setErrorMessage('Please enter your email in Step 1 first.');
+        return;
       }
+      
+      const storageRef = ref(storage, `resumes/${formData.email}/${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Save the resume URL in the form data state so it gets saved on submit
+      handleInputChange('resumeUrl')({ target: { value: downloadURL } });
+      setSuccessMessage('File uploaded successfully.');
+    } catch (error) {
+      console.error('Error uploading file to Firebase Storage:', error);
+      setErrorMessage('Error in setting up the request: ' + error.message);
     }
   };
 

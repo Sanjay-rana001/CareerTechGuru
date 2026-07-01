@@ -19,6 +19,7 @@ const Signup = () => {
     country : "",
     password: "",
     role: "",
+    resumeUrl: "",
   });
  
   const navigate = useNavigate();

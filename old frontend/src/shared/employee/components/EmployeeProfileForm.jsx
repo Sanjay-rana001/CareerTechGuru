@@ -222,6 +222,45 @@ const EmployeeProfileForm = () => {
                             Personal Information
                         </h3>
                         
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">First Name</label>
+                                <input 
+                                    type="text" 
+                                    className="w-full px-4 py-2.5 bg-slate-100 border border-slate-300 rounded-lg text-sm text-slate-600 cursor-not-allowed" 
+                                    value={values.firstName} 
+                                    disabled
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Name</label>
+                                <input 
+                                    type="text" 
+                                    className="w-full px-4 py-2.5 bg-slate-100 border border-slate-300 rounded-lg text-sm text-slate-600 cursor-not-allowed" 
+                                    value={values.lastName} 
+                                    disabled
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</label>
+                                <input 
+                                    type="email" 
+                                    className="w-full px-4 py-2.5 bg-slate-100 border border-slate-300 rounded-lg text-sm text-slate-600 cursor-not-allowed" 
+                                    value={values.email} 
+                                    disabled
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mobile Number</label>
+                                <input 
+                                    type="text" 
+                                    className="w-full px-4 py-2.5 bg-slate-100 border border-slate-300 rounded-lg text-sm text-slate-600 cursor-not-allowed" 
+                                    value={values.mobile} 
+                                    disabled
+                                />
+                            </div>
+                        </div>
+
                         <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bio</label>
                             <textarea 

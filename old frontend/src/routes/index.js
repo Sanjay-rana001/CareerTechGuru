@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 import SharedLayout from './SharedLayout'
 import EmployerLayout from './EmployerLayout'
 import RequiresAuth from './RequiresAuth'
@@ -26,6 +26,8 @@ const Index = () => {
           <Route element={<EmployerLayout />}>
             <Route element={<RequiresAuth />}>
               <Route path='/' element={<Dashboard />} />
+              <Route path='/register' element={<Navigate to="/" replace />} />
+              <Route path='/login' element={<Navigate to="/" replace />} />
               {employerRoutes.map((route, idx) => (
                 <Route key={idx} path={route.path} element={route.element} />
               ))}
@@ -34,6 +36,8 @@ const Index = () => {
         ) : role === 'user' && token ? (
           <Route element={<EmployeeLayout />}>
             <Route path='/' element={<EmployeHome />} />
+            <Route path='/register' element={<Navigate to="/" replace />} />
+            <Route path='/login' element={<Navigate to="/" replace />} />
             {ContentRoutes?.map((route, idx) => (
               <Route key={idx} path={route.path} element={route.element} />
             ))}

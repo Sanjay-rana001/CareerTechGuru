@@ -27,7 +27,7 @@ const Search = ({ categories }) => {
     try {
       const queryString = searchParams.toString();
       const result = await searchJobQuery(queryString);
-      setSearchResult(result);
+      setSearchResult(result?.data || []);
     } catch (error) {
       console.error(error);
     }
@@ -71,7 +71,7 @@ const Search = ({ categories }) => {
       if (experience) params.append('experience', experience);
       const queryString = params.toString();
       const result = await searchJobQuery(queryString);
-      setSearchResult(result);
+      setSearchResult(result?.data || []);
       navigate('/view-jobs?' + queryString, { replace: true });
     } catch (error) {
       console.error(error);

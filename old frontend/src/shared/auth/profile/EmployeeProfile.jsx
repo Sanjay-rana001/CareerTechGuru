@@ -64,8 +64,8 @@ const EmployeeProfile = () => {
     }));
   };
 
-  const categoryOptions = sections?.map((category) => ({ title: category?.title }));
-  const locationOptions = locations?.map((location) => ({ title: location?.title }));
+  const categoryOptions = sections?.map((category) => ({ title: category?.title })) || [];
+  const locationOptions = locations?.map((location) => ({ title: location?.title })) || [];
 
   return (
     <>

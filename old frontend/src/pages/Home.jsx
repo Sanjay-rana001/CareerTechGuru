@@ -17,7 +17,7 @@ const Home = () => {
   const fetchListedCompany = async () => {
     try {
       const result = await getCompanyList();
-      setCompanyListDetails(result?.data);
+      setCompanyListDetails(result || []);
     } catch (error) {
       console.log(error);
     }

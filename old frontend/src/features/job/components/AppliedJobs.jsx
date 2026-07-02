@@ -65,8 +65,13 @@ const AppliedJobs = () => {
     };
 
     getUserApplications();
-    fetchCategories();
   }, [getApplicationBySellerId, getAdminsDetailsById]);
+
+  useEffect(() => {
+    if (applications?.length > 0) {
+      fetchCategories();
+    }
+  }, [applications]);
 
   if (applications?.length <= 0) {
     return <div className='flex items-center justify-center h-[100vh]'>

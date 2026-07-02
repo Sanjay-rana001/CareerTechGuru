@@ -6,33 +6,36 @@ import { IoShareSocialSharp } from 'react-icons/io5';
 import DOMPurify from "dompurify";
 import ConfirmBox from '../components/modal/ConfirmBox';
 import { CircularLoader } from '../components';
+import { Helmet } from 'react-helmet-async';
+import { useQuery } from '@tanstack/react-query';
 
 const JobDetailPage = () => {
     const { getApplicationsByJobId, getAllApplications } = useJobContext();
     const { title } = useParams();
     const navigate = useNavigate();
-    const [jobData, setJobData] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [isConfirmBoxVisible, setConfirmBoxVisible] = useState(false);
 
-    const fetchJobDetails = async () => {
-        try {
-            const allApplications = await getAllApplications();
-            const job = allApplications.find(app => app.title === title);
-            if (job) {
-                const response = await getApplicationsByJobId(job._id);
-                setJobData(response?.data);
-            }
-            setLoading(false);
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
+    // React Query refactor: caching the applications list and the specific job details
+    const { data: allApplications, isLoading: isLoadingAll } = useQuery({
+        queryKey: ['allApplications'],
+        queryFn: async () => {
+            const res = await getAllApplications();
+            return res.data;
         }
-    };
+    });
 
-    useEffect(() => {
-        fetchJobDetails();
-    }, [title]);
+    const job = allApplications?.find(app => app.title === title);
+
+    const { data: jobData, isLoading: isLoadingJob } = useQuery({
+        queryKey: ['jobDetails', job?._id],
+        queryFn: async () => {
+            const res = await getApplicationsByJobId(job._id);
+            return res.data;
+        },
+        enabled: !!job?._id // Only fetch if we found the job from the first query
+    });
+
+    const loading = isLoadingAll || (!!job && isLoadingJob);
 
     const handleConfirm = () => {
         window.open(jobData?.jobUrl, '_blank', 'noopener,noreferrer');
@@ -59,6 +62,15 @@ const JobDetailPage = () => {
 
     return (
         <div className="bg-slate-50 min-h-screen py-10">
+            <Helmet>
+                <title>{jobData?.title} | CareerTechGuru</title>
+                <meta name="description" content={jobData?.shortDescription || "View job details on CareerTechGuru."} />
+                <meta property="og:title" content={`${jobData?.title} at ${jobData?.companyName}`} />
+                <meta property="og:description" content={jobData?.shortDescription || "View job details on CareerTechGuru."} />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={jobData?.profilePicture || "https://career-tech-guru.vercel.app/logo.jpeg"} />
+                <meta name="twitter:card" content="summary_large_image" />
+            </Helmet>
             {isConfirmBoxVisible && (
                 <ConfirmBox
                     message={`You will be redirected to ${jobData?.companyName} careers. Are you sure you want to continue?`}

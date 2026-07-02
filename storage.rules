@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isPDF() {
+      return request.resource.contentType.matches('application/pdf');
+    }
+
+    function isValidFileSize() {
+      return request.resource.size < 5 * 1024 * 1024; // 5MB max
+    }
+
+    // Resumes folder
+    match /resumes/{userId}/{fileName} {
+      allow read: if true; // Employers need to read it
+      allow write: if isAuthenticated() && isOwner(userId) && isPDF() && isValidFileSize();
+    }
+
+    // Profile Pictures folder
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isAuthenticated() && isOwner(userId) && isImage() && isValidFileSize();
+    }
+
+    // Fallback block for everything else
+    match /{allPaths=**} {
+      allow read, write: if false; // Deny all by default
+    }
+  }
+}

@@ -14,14 +14,19 @@ import {
 } from './context';
 
 import ErrorBoundary from './components/ErrorBoundary';
+import { HelmetProvider } from 'react-helmet-async';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
+const queryClient = new QueryClient();
 
 root.render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <AuthContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <HelmetProvider>
+        <ErrorBoundary>
+          <AuthContextProvider>
         <SearchContextProvider>
           <AdminContextProvider>
             <EmployeeContextProvider>
@@ -36,7 +41,9 @@ root.render(
           </AdminContextProvider>
         </SearchContextProvider>
       </AuthContextProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+      </HelmetProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
 reportWebVitals();

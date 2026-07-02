@@ -115,17 +115,17 @@ const AdminContextProvider = ({ children }) => {
     }
   };
 
-  // Function to get candidates data for ESPS
-  const getCadidatesDataESPS = async () => {
+  // Function to get all registered users (CMS User Management)
+  const getGlobalUsers = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "profiles"));
-      const candidates = [];
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const allUsers = [];
       querySnapshot.forEach((doc) => {
-        candidates.push({ id: doc.id, ...doc.data() });
+        allUsers.push({ id: doc.id, ...doc.data() });
       });
-      return { data: candidates };
+      return { data: allUsers };
     } catch (error) {
-      console.error('Error fetching candidates data:', error);
+      console.error('Error fetching global users:', error);
       return { data: [] };
     }
   };
@@ -145,7 +145,7 @@ const AdminContextProvider = ({ children }) => {
       createJobApplication,
       getApplicationByUserId,
       getApplicationBySellerId,
-      getCadidatesDataESPS
+      getGlobalUsers
     }}>
       {children}
     </AdminContext.Provider>

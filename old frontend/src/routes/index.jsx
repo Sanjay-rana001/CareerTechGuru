@@ -61,9 +61,11 @@ const Index = () => {
           </>
         )}
         <Route path='*' element={<Error />} />
-        <Route element={<AdminLayout />}>
-          <Route path='admin-dashboard' element={<AdminHome />} />
-        </Route>
+        {role === 'superadmin' && token ? (
+          <Route element={<AdminLayout />}>
+            <Route path='admin-dashboard' element={<AdminHome />} />
+          </Route>
+        ) : null}
       </Routes>
     </Suspense>
   )

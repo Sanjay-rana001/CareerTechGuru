@@ -4,13 +4,13 @@ import { getFirestore, clearIndexedDbPersistence } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBkZkl705MRWt6RYIXAWaKZdToL7iYPjik",
-  authDomain: "career-tech-guru.firebaseapp.com",
-  projectId: "career-tech-guru",
-  storageBucket: "career-tech-guru.firebasestorage.app",
-  messagingSenderId: "380855400532",
-  appId: "1:380855400532:web:50baf7b78f1783465815c1",
-  measurementId: "G-MGC398NV81"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);

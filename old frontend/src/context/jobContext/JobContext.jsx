@@ -8,7 +8,11 @@ import {
   doc, 
   deleteDoc, 
   query, 
-  where 
+  where,
+  limit,
+  orderBy,
+  startAfter,
+  getCountFromServer
 } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
 
@@ -33,17 +37,22 @@ const JobContextProvider = ({ children }) => {
     }
   };
 
-  const getAllApplications = async () => {
+  const getAllApplications = async (lastVisible = null, limitCount = 20) => {
     try {
-      const querySnapshot = await getDocs(collection(db, "jobs"));
+      let q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), limit(limitCount));
+      if (lastVisible) {
+        q = query(collection(db, "jobs"), orderBy("createdAt", "desc"), startAfter(lastVisible), limit(limitCount));
+      }
+      const querySnapshot = await getDocs(q);
       const jobs = [];
       querySnapshot.forEach((doc) => {
         jobs.push({ _id: doc.id, id: doc.id, ...doc.data() });
       });
-      return { data: jobs };
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      return { data: jobs, lastDoc };
     } catch (error) {
       console.error("Error fetching all applications/jobs:", error);
-      return { data: [] };
+      return { data: [], lastDoc: null };
     }
   };
 
@@ -88,10 +97,9 @@ const JobContextProvider = ({ children }) => {
     }
   };
 
-  const searchJobQuery = async (paramsString) => {
+  const searchJobQuery = async (paramsString, lastVisible = null, limitCount = 20) => {
     try {
       const params = new URLSearchParams(paramsString);
-      let q = collection(db, "jobs");
       const constraints = [];
       
       const category = params.get("category");
@@ -102,8 +110,16 @@ const JobContextProvider = ({ children }) => {
       if (location) constraints.push(where("location", "==", location));
       if (experience) constraints.push(where("experience", "==", experience));
       
-      if (constraints.length > 0) {
-        q = query(q, ...constraints);
+      // Get the total count quickly without fetching documents
+      let countQuery = query(collection(db, "jobs"), ...constraints);
+      const snapshotCount = await getCountFromServer(countQuery);
+      const totalCount = snapshotCount.data().count;
+
+      // Now fetch the paginated data
+      let q = query(collection(db, "jobs"), ...constraints, orderBy("createdAt", "desc"), limit(limitCount));
+      
+      if (lastVisible) {
+        q = query(collection(db, "jobs"), ...constraints, orderBy("createdAt", "desc"), startAfter(lastVisible), limit(limitCount));
       }
       
       const querySnapshot = await getDocs(q);
@@ -111,10 +127,13 @@ const JobContextProvider = ({ children }) => {
       querySnapshot.forEach((doc) => {
         jobs.push({ _id: doc.id, id: doc.id, ...doc.data() });
       });
-      return { data: jobs };
+      
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      
+      return { data: jobs, lastDoc, totalCount };
     } catch (error) {
       console.error("Error searching jobs:", error.message);
-      return { data: [] };
+      return { data: [], lastDoc: null, totalCount: 0 };
     }
   };
 

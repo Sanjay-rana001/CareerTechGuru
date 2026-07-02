@@ -4,7 +4,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useJobContext, useSearchContext } from '../../context';
 
 const Search = ({ categories }) => {
-  const { setSearchResult } = useSearchContext();
+  const { 
+    setSearchResult, 
+    setLastVisibleDoc, 
+    setTotalJobsCount,
+    setIsSearchLoading 
+  } = useSearchContext();
   const { searchJobQuery, getJobSingleDetail } = useJobContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,11 +30,16 @@ const Search = ({ categories }) => {
 
   const fetchInitialJobs = async () => {
     try {
+      setIsSearchLoading(true);
       const queryString = searchParams.toString();
-      const result = await searchJobQuery(queryString);
+      const result = await searchJobQuery(queryString, null, 20); // pass null for lastVisible to start fresh
       setSearchResult(result?.data || []);
+      setLastVisibleDoc(result?.lastDoc || null);
+      setTotalJobsCount(result?.totalCount || 0);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSearchLoading(false);
     }
   };
 
@@ -65,16 +75,23 @@ const Search = ({ categories }) => {
 
   const handleSearch = async () => {
     try {
+      setIsSearchLoading(true);
       const params = new URLSearchParams();
       if (category) params.append('category', category);
       if (location) params.append('jobLocation', location);
       if (experience) params.append('experience', experience);
       const queryString = params.toString();
-      const result = await searchJobQuery(queryString);
+      
+      const result = await searchJobQuery(queryString, null, 20);
       setSearchResult(result?.data || []);
+      setLastVisibleDoc(result?.lastDoc || null);
+      setTotalJobsCount(result?.totalCount || 0);
+      
       navigate('/view-jobs?' + queryString, { replace: true });
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSearchLoading(false);
     }
   };
 

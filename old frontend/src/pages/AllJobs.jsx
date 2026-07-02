@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { Pagination, Search } from '../components'
+import { Search } from '../components'
 import { JobCardTwo } from '../shared'
 import { useJobContext, useSearchContext, useSectionContext } from '../context'
-import { sortDataByDate } from '../utils/filters/Filters';
 import { useNavigate, useSearchParams } from "react-router-dom";
  
 const AllJobs = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { searchResult } = useSearchContext();
+  const { 
+    searchResult, 
+    setSearchResult, 
+    lastVisibleDoc, 
+    setLastVisibleDoc,
+    totalJobsCount,
+    isSearchLoading 
+  } = useSearchContext();
+  const { searchJobQuery } = useJobContext();
   const { getAllSections } = useSectionContext();
+  
   const [sections, setSections] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
  
   const getApplicationCategory = async() => {
     try {
@@ -28,16 +34,38 @@ const AllJobs = () => {
     window.location.href = '/view-jobs';
   };
  
-  const indexOfLastJob = currentPage * itemsPerPage;
-  const indexOfFirstJob = indexOfLastJob - itemsPerPage;
-  const currentJobs = (searchResult || []).slice(indexOfFirstJob, indexOfLastJob);
-  const sortedJobs = sortDataByDate(currentJobs, 'createdAt')
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const navigate = useNavigate();
- 
+  const fetchNextPage = async () => {
+    if (!lastVisibleDoc) return;
+    setIsFetchingMore(true);
+    try {
+      const queryString = searchParams.toString();
+      const result = await searchJobQuery(queryString, lastVisibleDoc, 20);
+      
+      // Append new jobs to existing
+      if (result?.data?.length > 0) {
+        setSearchResult(prev => [...prev, ...result.data]);
+        setLastVisibleDoc(result.lastDoc);
+      } else {
+        setLastVisibleDoc(null); // No more jobs
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  };
+
   useEffect(() => {
     getApplicationCategory();
   }, []);
+
+  if (isSearchLoading) {
+    return (
+      <div className='min-h-[80vh] bg-slate-50 py-10 flex justify-center items-center'>
+        <div className="text-slate-500 font-medium text-lg">Searching jobs...</div>
+      </div>
+    )
+  }
 
   if (!searchResult || searchResult.length === 0) {
     return (
@@ -75,30 +103,30 @@ const AllJobs = () => {
         {/* Results Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 px-6 py-4 rounded-xl shadow-sm gap-4 mb-6">
           <h3 className='text-sm font-semibold text-slate-600 mb-0'>
-            Results &mdash; {searchResult?.length} jobs found
+            Results &mdash; {totalJobsCount} jobs found
           </h3>
-          <Pagination
-            totalItems={searchResult.length}
-            itemsPerPage={itemsPerPage}
-            currentPage={currentPage}
-            onPageChange={paginate}
-          />
+          <p className="text-xs text-slate-400">Showing {searchResult.length} of {totalJobsCount}</p>
         </div>
 
         {/* Jobs List Grid */}
         <div className="grid grid-cols-1 gap-4">
-          <JobCardTwo data={sortedJobs} />
+          <JobCardTwo data={searchResult} />
         </div>
 
-        {/* Bottom Pagination */}
-        {searchResult.length > itemsPerPage && (
+        {/* Load More Button */}
+        {lastVisibleDoc && (
           <div className="flex justify-center mt-8">
-            <Pagination
-              totalItems={searchResult.length}
-              itemsPerPage={itemsPerPage}
-              currentPage={currentPage}
-              onPageChange={paginate}
-            />
+            <button 
+              onClick={fetchNextPage} 
+              disabled={isFetchingMore}
+              className={`px-8 py-3 rounded-lg font-medium text-sm transition-colors ${
+                isFetchingMore 
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  : 'bg-white border-2 border-[#2563EB] text-[#2563EB] hover:bg-blue-50'
+              }`}
+            >
+              {isFetchingMore ? 'Loading...' : 'Load More Jobs'}
+            </button>
           </div>
         )}
       </div>

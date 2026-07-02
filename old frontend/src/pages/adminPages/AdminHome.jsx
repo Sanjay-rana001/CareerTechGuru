@@ -11,6 +11,12 @@ const AdminHome = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Pagination states
+  const [lastUserDoc, setLastUserDoc] = useState(null);
+  const [lastJobDoc, setLastJobDoc] = useState(null);
+  const [loadingMoreUsers, setLoadingMoreUsers] = useState(false);
+  const [loadingMoreJobs, setLoadingMoreJobs] = useState(false);
+
   useEffect(() => {
     fetchCMSData();
   }, []);
@@ -19,16 +25,57 @@ const AdminHome = () => {
     setLoading(true);
     try {
       const [usersRes, jobsRes] = await Promise.all([
-        getGlobalUsers(),
-        getAllApplications()
+        getGlobalUsers(null, 20),
+        getAllApplications(null, 20)
       ]);
       setUsers(usersRes?.data || []);
+      setLastUserDoc(usersRes?.lastDoc || null);
+
       setJobs(jobsRes?.data || []);
+      setLastJobDoc(jobsRes?.lastDoc || null);
     } catch (error) {
       console.error(error);
       toast.error("Error fetching CMS data");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMoreUsers = async () => {
+    if (!lastUserDoc) return;
+    setLoadingMoreUsers(true);
+    try {
+      const res = await getGlobalUsers(lastUserDoc, 20);
+      if (res?.data?.length > 0) {
+        setUsers(prev => [...prev, ...res.data]);
+        setLastUserDoc(res.lastDoc);
+      } else {
+        setLastUserDoc(null);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error fetching more users");
+    } finally {
+      setLoadingMoreUsers(false);
+    }
+  };
+
+  const loadMoreJobs = async () => {
+    if (!lastJobDoc) return;
+    setLoadingMoreJobs(true);
+    try {
+      const res = await getAllApplications(lastJobDoc, 20);
+      if (res?.data?.length > 0) {
+        setJobs(prev => [...prev, ...res.data]);
+        setLastJobDoc(res.lastDoc);
+      } else {
+        setLastJobDoc(null);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error fetching more jobs");
+    } finally {
+      setLoadingMoreJobs(false);
     }
   };
 
@@ -76,11 +123,11 @@ const AdminHome = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow border-t-4 border-blue-500">
             <h3 className="text-gray-500 text-sm font-semibold">Total Registered Users</h3>
-            <p className="text-4xl font-bold mt-2">{users.length}</p>
+            <p className="text-4xl font-bold mt-2">{users.length}{lastUserDoc && '+'}</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow border-t-4 border-green-500">
             <h3 className="text-gray-500 text-sm font-semibold">Total Active Jobs</h3>
-            <p className="text-4xl font-bold mt-2">{jobs.length}</p>
+            <p className="text-4xl font-bold mt-2">{jobs.length}{lastJobDoc && '+'}</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow border-t-4 border-purple-500">
             <h3 className="text-gray-500 text-sm font-semibold">Platform Health</h3>
@@ -114,6 +161,17 @@ const AdminHome = () => {
               {jobs.length === 0 && <tr><td colSpan="4" className="text-center p-4">No jobs found.</td></tr>}
             </tbody>
           </table>
+          {lastJobDoc && (
+            <div className="p-4 flex justify-center border-t border-gray-200 bg-gray-50">
+              <button 
+                onClick={loadMoreJobs}
+                disabled={loadingMoreJobs}
+                className="px-6 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors"
+              >
+                {loadingMoreJobs ? 'Loading...' : 'Load More Jobs'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -146,6 +204,17 @@ const AdminHome = () => {
               {users.length === 0 && <tr><td colSpan="4" className="text-center p-4">No users found.</td></tr>}
             </tbody>
           </table>
+          {lastUserDoc && (
+            <div className="p-4 flex justify-center border-t border-gray-200 bg-gray-50">
+              <button 
+                onClick={loadMoreUsers}
+                disabled={loadingMoreUsers}
+                className="px-6 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors"
+              >
+                {loadingMoreUsers ? 'Loading...' : 'Load More Users'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

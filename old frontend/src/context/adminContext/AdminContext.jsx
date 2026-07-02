@@ -7,7 +7,10 @@ import {
   collection, 
   query, 
   where, 
-  getDocs 
+  getDocs,
+  limit,
+  orderBy,
+  startAfter
 } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
@@ -116,17 +119,28 @@ const AdminContextProvider = ({ children }) => {
   };
 
   // Function to get all registered users (CMS User Management)
-  const getGlobalUsers = async () => {
+  const getGlobalUsers = async (lastVisible = null, limitCount = 20) => {
     try {
-      const querySnapshot = await getDocs(collection(db, "users"));
+      // Assuming users collection doesn't have createdAt reliably, we can just paginate by document ID or a specific field.
+      // Firestore requires an orderBy to use startAfter. We'll use email as a reliable alphabetical sort.
+      let q = query(collection(db, "users"), orderBy("email"), limit(limitCount));
+      
+      if (lastVisible) {
+        q = query(collection(db, "users"), orderBy("email"), startAfter(lastVisible), limit(limitCount));
+      }
+      
+      const querySnapshot = await getDocs(q);
       const allUsers = [];
       querySnapshot.forEach((doc) => {
         allUsers.push({ id: doc.id, ...doc.data() });
       });
-      return { data: allUsers };
+      
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      
+      return { data: allUsers, lastDoc };
     } catch (error) {
       console.error('Error fetching global users:', error);
-      return { data: [] };
+      return { data: [], lastDoc: null };
     }
   };
 

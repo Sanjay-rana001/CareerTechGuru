@@ -5,7 +5,7 @@ import { FaLinkedin, FaEnvelope, FaPhone, FaLink } from "react-icons/fa";
 import UpdateInput from "../../../components/modal/UpdateInput";
 import { ModalBox } from "../../../components";
 import { Link } from "react-router-dom";
-import EmployerProfileForm from "./ProfileFormOne";
+import EmployerProfileForm from "../EmployerProfileForm";
 
 const EmployerProfile = () => {
   const [openModal, setOpenModal] = useState(false);

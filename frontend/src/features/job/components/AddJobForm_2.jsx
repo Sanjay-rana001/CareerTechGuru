@@ -275,20 +275,20 @@ const AddJobForm_2 = ({
                   </div>
                 </>
               )}
-              <div
-                className="form-group mt-4 d-flex gap-3 py-3"
-                style={{ marginTop: "10px" }}
-              >
+              <div className="form-group mt-4 flex gap-4 py-3 items-center">
+                <button
+                  onClick={prevStep}
+                  className="px-6 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Back
+                </button>
                 <button
                   onClick={handleSubmit}
-                  className="btn bg-prime text-light"
+                  className="px-6 py-2 rounded-md bg-[#2563EB] text-white hover:bg-blue-700 transition-colors"
                 >
                   Submit
                 </button>
               </div>
-              <button onClick={prevStep} className="btn">
-                Back
-              </button>
             </div>
           </div>
         </div>

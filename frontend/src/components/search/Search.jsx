@@ -68,8 +68,8 @@ const Search = ({ categories }) => {
 
   const locationOptions =
     locations?.map((loc) => ({
-      value: loc,
-      label: loc,
+      value: loc?.value || loc,
+      label: loc?.label || loc,
     })) || [];
 
   const experienceOptions = [

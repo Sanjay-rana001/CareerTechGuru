@@ -39,5 +39,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false; // Change to admin claim if needed
     }
+
+    // Contact Us queries can be submitted by anyone.
+    match /contact_queries/{queryId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
   }
 }

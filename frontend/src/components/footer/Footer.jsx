@@ -7,8 +7,12 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { useBrandContext } from "../../context";
 
 const Footer = () => {
+  const { siteConfig } = useBrandContext();
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,7 +20,7 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="space-y-4">
             <h4 className="text-white text-lg font-semibold tracking-wide">
-              Career<span className="text-[#2563EB]">TechGuru</span>
+              {siteConfig.logoTextPrimary}<span className="text-[#2563EB]">{siteConfig.logoTextSecondary}</span>
             </h4>
             <p className="text-sm text-slate-400 leading-relaxed">
               Matching awesome talent with awesome jobs around the world. Prove
@@ -129,7 +133,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2 text-slate-400 mt-2">
                 <FaEnvelope size={14} className="text-slate-500" />
-                <span>support@careertechguru.com</span>
+                <span>{siteConfig.contactEmail}</span>
               </li>
             </ul>
           </div>
@@ -138,8 +142,8 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-500 mb-0">
-            &copy; {new Date().getFullYear()} CareerTechGuru. All rights
-            reserved. Powered by ESPS Pvt Ltd.
+            &copy; {new Date().getFullYear()} {siteConfig.appName}. All rights
+            reserved. Powered by {siteConfig.companyName}.
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
             <a

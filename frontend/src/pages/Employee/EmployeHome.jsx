@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { JobCardTwo } from "../../shared";
 import {
+  useBrandContext,
   useEmployeeContext,
   useSearchContext,
   useSectionContext,
@@ -16,6 +17,7 @@ import "../../../src/App.css";
 import MediaQuery from "react-responsive";
 
 const EmployeHome = () => {
+  const { siteConfig } = useBrandContext();
   const user = JSON.parse(sessionStorage.getItem("data"));
   const { searchResult } = useSearchContext();
   const { getAllSections } = useSectionContext();
@@ -101,8 +103,7 @@ const EmployeHome = () => {
               <div className="box" class="dream">
                 <h1 className="display-5 fw-bold ms-4">FIND YOUR DREAM JOB!</h1>
                 <p className="font-semibold text-dark ms-4">
-                  Increase your chance to get call from recruiters with Career
-                  Techguru
+                  Increase your chance to get call from recruiters with {siteConfig.appName}
                 </p>
               </div>
             </div>

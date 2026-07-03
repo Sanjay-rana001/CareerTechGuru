@@ -3,7 +3,8 @@ import { FiUserCheck, FiUsers, FiUserX } from "react-icons/fi";
 import { FaRegEye, FaSuitcase } from "react-icons/fa";
 import { HiOutlineCursorClick } from "react-icons/hi";
 import { CiFilter } from "react-icons/ci";
-import { useJobContext } from "../../../context";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../../../firebase";
 import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -25,48 +26,62 @@ ChartJS.register(
 );
 
 const EmployerDash = () => {
-  const admin = JSON.parse(sessionStorage.getItem("data"));
-  const { getApplicationsByAdminId } = useJobContext();
   const [jobsData, setJobsData] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
-    try {
-      const adminId = admin?._id || admin?.id;
-      if (!adminId) {
-        setLoading(false);
-        return;
-      }
-      const jobsData = await getApplicationsByAdminId(adminId);
-      if (jobsData && jobsData.length > 0) {
-        setJobsData(jobsData);
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
+
+    const adminId = currentUser.uid;
+
+    // Real-time listener for jobs posted by this employer
+    const jobsQuery = query(
+      collection(db, "jobs"),
+      where("postedBy", "==", adminId)
+    );
+    
+    const unsubscribeJobs = onSnapshot(jobsQuery, (snapshot) => {
+      const jobs = [];
+      snapshot.forEach((doc) => {
+        jobs.push({ id: doc.id, ...doc.data() });
+      });
+      setJobsData(jobs);
+      setLoading(false);
+    });
+
+    // Real-time listener for applications received by this employer
+    const appsQuery = query(
+      collection(db, "applications"),
+      where("sellerId", "==", adminId)
+    );
+
+    const unsubscribeApps = onSnapshot(appsQuery, (snapshot) => {
+      const apps = [];
+      snapshot.forEach((doc) => {
+        apps.push({ id: doc.id, ...doc.data() });
+      });
+      setApplications(apps);
+    });
+
+    return () => {
+      unsubscribeJobs();
+      unsubscribeApps();
+    };
   }, []);
 
   const totalJobsPosted = jobsData?.length || 0;
   const totalClicks = jobsData.reduce((acc, job) => acc + (job.clicks || 0), 0);
   const totalViews = jobsData.reduce((acc, job) => acc + (job.views || 0), 0);
-  const totalApplicants = jobsData.reduce(
-    (acc, job) => acc + (job.applicants || 0),
-    0,
-  );
-  const totalSelectedApplicants = jobsData.reduce(
-    (acc, job) => acc + (job.selected || 0),
-    0,
-  );
-  const totalRejectedApplicants = jobsData.reduce(
-    (acc, job) => acc + (job.rejected || 0),
-    0,
-  );
+  
+  const totalApplicants = applications.length;
+  const totalSelectedApplicants = applications.filter((app) => app.status === "accepted").length;
+  const totalRejectedApplicants = applications.filter((app) => app.status === "rejected").length;
+  
   const applyRate = totalViews ? (totalApplicants / totalViews) * 100 : 0;
 
   const pieData = {

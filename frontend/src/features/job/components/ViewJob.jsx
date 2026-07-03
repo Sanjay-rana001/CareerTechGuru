@@ -77,10 +77,13 @@ const ViewJob = () => {
         setCategories(categoriesData?.data);
 
         // Then fetch job data
-        const jobsData = await getApplicationsByAdminId(admin?.id);
-        if (jobsData && jobsData.length > 0) {
-          const sortedData = sortDataByDate(jobsData, "createdAt");
-          setJobsData(sortedData);
+        const adminId = admin?._id || admin?.id;
+        if (adminId) {
+          const jobsData = await getApplicationsByAdminId(adminId);
+          if (jobsData && jobsData.length > 0) {
+            const sortedData = sortDataByDate(jobsData, "createdAt");
+            setJobsData(sortedData);
+          }
         }
         setLoading(false);
       } catch (error) {

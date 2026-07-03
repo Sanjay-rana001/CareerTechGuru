@@ -1,61 +1,99 @@
 import React from "react";
 import { MdClose } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../../firebase";
 
-const CandidateProfile = ({ handleModalClose, candidateData }) => {
+import { toast } from "react-hot-toast";
+
+const CandidateProfile = ({ handleModalClose, candidateData, application }) => {
+  const handleAction = async (action) => {
+    try {
+      if (application?.id) {
+        const appRef = doc(db, "applications", application.id);
+        await updateDoc(appRef, { status: action.toLowerCase() });
+        toast.success(`Candidate marked as ${action}`);
+      } else {
+        toast.error("Application ID missing");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update status");
+    }
+    handleModalClose();
+  };
+
   return (
-    <div className="col-lg-8 bg-light relative py-3">
-      <span
-        className="absolute right-4 cursor-pointer"
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-2xl w-full mx-auto relative font-sans">
+      <button
+        className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
         onClick={handleModalClose}
         aria-label="Close"
       >
-        <MdClose />
-      </span>
-      <div className="col py-3">
-        <h4 className="text-2xl font-semibold text-blue-500">
+        <MdClose size={24} />
+      </button>
+      <div className="p-8">
+        <h4 className="text-2xl font-bold text-slate-800 mb-6">
           Candidate Profile
         </h4>
-        <div className="row mb-3">
-          <div className="col-sm-4">
-            <div className="col-6">
-              <img
-                src="https://i.pravatar.cc/300"
-                alt=""
-                className="img-fluid"
-              />
-            </div>
+        <div className="flex flex-col sm:flex-row gap-6 mb-8">
+          <div className="flex-shrink-0">
+            <img
+              src={candidateData?.profilePictureUrl || candidateData?.profilePicture || "https://i.pravatar.cc/150"}
+              alt="Profile"
+              className="w-24 h-24 rounded-full object-cover border-4 border-slate-50"
+            />
           </div>
-          <div className="col-sm flex justify-between">
-            <div className="col">
-              <h3 className="h6 font-semibold capitalize">
-                {candidateData[0]?.userDetail?.firstName}{" "}
-                {candidateData[0]?.userDetail?.lastName}
+          <div className="flex-grow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h3 className="text-xl font-bold text-slate-800 capitalize mb-1">
+                {application?.firstName || candidateData?.firstName}{" "}
+                {application?.lastName || candidateData?.lastName}
               </h3>
-              <h3 className="h6">{candidateData[0]?.userDetail?.email}</h3>
-              <h3 className="h6">{candidateData[0]?.userDetail?.mobile}</h3>
+              <p className="text-slate-500 mb-1">{application?.userEmail || candidateData?.email}</p>
+              <p className="text-slate-500">{application?.userMobile || candidateData?.mobile}</p>
             </div>
-            <div className="col">
-              <button className="btn btn-primary text-light">
-                Download CV
+            <div>
+              <button 
+                onClick={() => {
+                  if (candidateData?.resumeUrl) {
+                    window.open(candidateData.resumeUrl, "_blank", "noopener,noreferrer");
+                  } else {
+                    toast.error("Candidate has not uploaded a resume.");
+                  }
+                }}
+                className={`px-5 py-2.5 font-semibold rounded-lg transition-colors border-0 ${
+                  candidateData?.resumeUrl 
+                    ? "bg-blue-50 text-blue-600 hover:bg-blue-100" 
+                    : "bg-slate-50 text-slate-400 cursor-not-allowed"
+                }`}
+              >
+                {candidateData?.resumeUrl ? "Download CV" : "No CV Uploaded"}
               </button>
             </div>
           </div>
         </div>
-        <ul className="nav justify-evenly bg-blue-300">
-          <li className="nav-item py-3">
-            <Link className="text-center">Accept</Link>
-          </li>
-          <li className="nav-item py-3">
-            <Link className="text-center">Cancel</Link>
-          </li>
-          <li className="nav-item py-3">
-            <Link className="text-center">Hold</Link>
-          </li>
-          <li className="nav-item py-3">
-            <Link className="text-center">Call</Link>
-          </li>
-        </ul>
+        
+        <div className="flex flex-wrap gap-3 pt-6 border-t border-slate-100">
+          <button 
+            onClick={() => handleAction("Accepted")}
+            className="flex-1 min-w-[120px] py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors border-0"
+          >
+            Accept
+          </button>
+          <button 
+            onClick={() => handleAction("Rejected")}
+            className="flex-1 min-w-[120px] py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors border-0"
+          >
+            Reject
+          </button>
+          <button 
+            onClick={() => handleAction("On Hold")}
+            className="flex-1 min-w-[120px] py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors border-0"
+          >
+            Hold
+          </button>
+        </div>
       </div>
     </div>
   );

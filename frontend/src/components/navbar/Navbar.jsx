@@ -3,12 +3,13 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import logoImg from "../../assets/logo.jpeg";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { FiLogOut, FiUser } from "react-icons/fi";
-import { useAuthContext } from "../../context";
+import { useAuthContext, useBrandContext } from "../../context";
 import { confirmAlert } from "react-confirm-alert";
 
 const Navbar = () => {
   const { logoutUser } = useAuthContext();
   const userRole = sessionStorage.getItem("role");
+  const { siteConfig } = useBrandContext();
   const navigate = useNavigate();
   const location = useLocation();
   const [nav, setNav] = useState(false);
@@ -80,7 +81,7 @@ const Navbar = () => {
               className="w-10 h-10 rounded-lg object-cover"
             />
             <span className="font-semibold text-slate-800 text-lg tracking-wide">
-              Career<span className="text-[#2563EB]">TechGuru</span>
+              {siteConfig.logoTextPrimary}<span className="text-[#2563EB]">{siteConfig.logoTextSecondary}</span>
             </span>
           </Link>
 
@@ -156,7 +157,7 @@ const Navbar = () => {
                       className="w-9 h-9 rounded-lg object-cover"
                     />
                     <span className="font-semibold text-slate-800 text-base tracking-wide">
-                      Career<span className="text-[#2563EB]">TechGuru</span>
+                      {siteConfig.logoTextPrimary}<span className="text-[#2563EB]">{siteConfig.logoTextSecondary}</span>
                     </span>
                   </Link>
                 </li>

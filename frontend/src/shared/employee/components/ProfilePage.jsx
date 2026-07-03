@@ -18,6 +18,8 @@ const ProfilePage = ({ data }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [file, setFile] = useState(null);
   const fileInput = useRef(null);
+  const profilePicInput = useRef(null);
+  const [uploadingPic, setUploadingPic] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -59,6 +61,40 @@ const ProfilePage = ({ data }) => {
     }
   };
 
+  const handleProfilePicChange = async (e) => {
+    const picFile = e.target.files[0];
+    if (!picFile) return;
+    
+    setUploadingPic(true);
+    try {
+      const currentUser = auth.currentUser;
+      const userEmail = data?.email || (currentUser ? currentUser.email : null);
+      if (!userEmail) throw new Error("User email not found");
+
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, `profile_pictures/${userEmail}/${picFile.name}`);
+      const snapshot = await uploadBytes(storageRef, picFile);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Update in profiles
+      const profileRef = doc(db, "profiles", userEmail);
+      await setDoc(profileRef, { profilePictureUrl: downloadURL }, { merge: true });
+      
+      // Update in users collection as well
+      if (currentUser?.uid) {
+        await setDoc(doc(db, "users", currentUser.uid), { profilePictureUrl: downloadURL }, { merge: true });
+      }
+
+      alert("Profile picture updated successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      alert("Failed to upload profile picture: " + error.message);
+    } finally {
+      setUploadingPic(false);
+    }
+  };
+
   const handleEditClick = (field, value) => {
     setCurrentField(field);
     setCurrentValue(value);
@@ -81,8 +117,33 @@ const ProfilePage = ({ data }) => {
         {/* Main Profile Header Card */}
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 mb-6">
           <div className="flex flex-col md:flex-row gap-6 justify-between items-center text-center md:text-left">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div 
+                className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-slate-50 shadow-sm cursor-pointer group"
+                onClick={() => profilePicInput.current?.click()}
+                title="Click to upload profile picture"
+              >
+                <img 
+                  src={data?.profilePictureUrl || "https://i.pravatar.cc/300"} 
+                  alt="Profile" 
+                  className={`w-full h-full object-cover ${uploadingPic ? 'opacity-50' : ''}`}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 flex items-center justify-center transition-all">
+                  <span className="text-white text-xs font-bold opacity-0 group-hover:opacity-100">
+                    {uploadingPic ? "UPLOADING..." : "UPLOAD"}
+                  </span>
+                </div>
+                <input 
+                  type="file" 
+                  ref={profilePicInput} 
+                  onChange={handleProfilePicChange} 
+                  className="hidden" 
+                  accept="image/png, image/jpeg, image/jpg"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
                 {data?.firstName} {data?.lastName}
               </h2>
               <p className="text-sm font-medium text-slate-500 mb-0 flex flex-wrap justify-center md:justify-start gap-2">
@@ -96,6 +157,7 @@ const ProfilePage = ({ data }) => {
                   </>
                 )}
               </p>
+            </div>
             </div>
 
             {/* Social Links Row */}

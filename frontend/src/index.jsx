@@ -11,6 +11,7 @@ import {
   JobContextProvider,
   SearchContextProvider,
   SectionContextProvider,
+  BrandContextProvider,
 } from "./context";
 
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -26,21 +27,23 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
         <ErrorBoundary>
-          <AuthContextProvider>
-            <SearchContextProvider>
-              <AdminContextProvider>
-                <EmployeeContextProvider>
-                  <JobContextProvider>
-                    <SectionContextProvider>
-                      <Router>
-                        <App />
-                      </Router>
-                    </SectionContextProvider>
-                  </JobContextProvider>
-                </EmployeeContextProvider>
-              </AdminContextProvider>
-            </SearchContextProvider>
-          </AuthContextProvider>
+          <BrandContextProvider>
+            <AuthContextProvider>
+              <SearchContextProvider>
+                <AdminContextProvider>
+                  <EmployeeContextProvider>
+                    <JobContextProvider>
+                      <SectionContextProvider>
+                        <Router>
+                          <App />
+                        </Router>
+                      </SectionContextProvider>
+                    </JobContextProvider>
+                  </EmployeeContextProvider>
+                </AdminContextProvider>
+              </SearchContextProvider>
+            </AuthContextProvider>
+          </BrandContextProvider>
         </ErrorBoundary>
       </HelmetProvider>
     </QueryClientProvider>

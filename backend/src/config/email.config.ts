@@ -19,7 +19,7 @@ const EmailVerificationProvider = async (
     },
   } as SMTPTransport.Options);
   let mailOptions = {
-    from: '"Career Techguru" <no-reply@careertechguru.co>',
+    from: `"${process.env.APP_NAME || 'Job Board'}" <${process.env.SMTP_SENDER || 'no-reply@yourcompany.com'}>`,
     to: email,
     subject: "Your OTP Verification Code",
     text: `Your OTP code is ${otp}`,

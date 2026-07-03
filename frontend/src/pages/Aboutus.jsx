@@ -1,6 +1,8 @@
 import React from "react";
+import { useBrandContext } from "../context";
 
 const Aboutus = () => {
+  const { siteConfig } = useBrandContext();
   return (
     <>
       <div className="container-fluid">
@@ -8,8 +10,7 @@ const Aboutus = () => {
           <div className="row py-4">
             <div className="col-lg">
               <h1 className="display-2 font-semibold text-center">
-                <span className="text-prime">Career Techguru</span> is where the
-                world of business meets their goal
+                <span className="text-prime">{siteConfig.appName}</span> {siteConfig.aboutUsHeroHeading}
               </h1>
             </div>
           </div>
@@ -26,15 +27,7 @@ const Aboutus = () => {
             <div className="col-lg">
               <h3 className="text-prime h3">About us</h3>
               <p>
-                Career Techguru, at its core, is transforming how businesses
-                operate on a day-to-day basis. Our AI professionals outshine
-                conventional roles, blending voice and cognitive capabilities
-                for 24/7 productivity without compromise. Tailored for seamless
-                integration, our solutions, coupled with pioneering augmented
-                reality innovations, don't just advance operational efficiency;
-                they redefine the potential of workplace, where precision,
-                efficiency and human creativity is amplified by AI, achieving
-                unparalleled performance.
+                {siteConfig.aboutUsDescription}
               </p>
             </div>
           </div>

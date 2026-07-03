@@ -119,9 +119,25 @@ const AuthContextProvider = ({ children }) => {
         username: credentials.username || "",
         country: credentials.country || "",
         role: credentials.role || "user",
+        resumeUrl: credentials.resumeUrl || "",
+        profilePictureUrl: "",
       };
 
       await setDoc(doc(db, "users", user.uid), userData);
+
+      // Initialize the employee profile document if it's a standard user/candidate
+      if (userData.role === "user") {
+        await setDoc(doc(db, "profiles", credentials.email), {
+          uid: user.uid,
+          email: credentials.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          mobile: userData.mobile,
+          resumeUrl: userData.resumeUrl,
+          profilePictureUrl: "",
+          createdAt: new Date().toISOString(),
+        });
+      }
 
       setAuthData(token, userData.role, { _id: user.uid, ...userData });
       toast.success("Registration successful");

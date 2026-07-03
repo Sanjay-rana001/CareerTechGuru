@@ -3,9 +3,18 @@ import { useAdminContext, useEmployeeContext } from "../../context";
 import { useNavigate } from "react-router-dom";
 import { CircularLoader } from "../../components";
 
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 const EmployeeAppliedJobs = () => {
   const { getApplicationByUserId } = useAdminContext();
-  const { formatDate } = useEmployeeContext();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

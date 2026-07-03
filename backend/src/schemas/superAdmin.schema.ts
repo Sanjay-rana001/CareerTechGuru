@@ -15,8 +15,8 @@ const candidateSchemaValidation: ObjectSchema = Joi.object().keys({
   CanAttendWalkInInterview: Joi.string().valid("Yes", "No").required(),
   CurrentSalary: Joi.number().positive().precision(2).required(),
   ExpectedSalary: Joi.number().positive().precision(2).required(),
-  InterviewedAtESPSBefore: Joi.string().valid("Yes", "No").required(),
-  AppliedAtESPSBefore: Joi.string().valid("Yes", "No").required(),
+  InterviewedAtCompanyBefore: Joi.string().valid("Yes", "No").required(),
+  AppliedAtCompanyBefore: Joi.string().valid("Yes", "No").required(),
   BoundByCurrentCompany: Joi.string().valid("Yes", "No").required(),
   NoticePeriod: Joi.string().min(1).max(50).required(), // Adjust min and max as per actual notice period text format
   CanHandleMultipleWork: Joi.string().valid("Yes", "No").required(),

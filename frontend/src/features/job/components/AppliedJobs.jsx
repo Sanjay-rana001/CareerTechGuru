@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../../../firebase";
 import {
   useAdminContext,
   useEmployeeContext,
@@ -8,6 +10,16 @@ import { Link, useNavigate } from "react-router-dom";
 import ModalBox from "../../../components/modal/ModalBox";
 import CandidateProfile from "./candidate/CandidateProfile";
 
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 const AppliedJobs = () => {
   const {
     getApplicationBySellerId,
@@ -15,7 +27,6 @@ const AppliedJobs = () => {
     getCandidateDetails,
   } = useAdminContext();
   const { getJobSectionById } = useSectionContext();
-  const { formatDate } = useEmployeeContext();
   const [applications, setApplications] = useState([]);
   const [companyData, setCompanyData] = useState([]);
   const [candidateData, setCandidateData] = useState([]);
@@ -23,6 +34,7 @@ const AppliedJobs = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const navigate = useNavigate();
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [selectedApplication, setSelectedApplication] = useState(null);
 
   const fetchCategories = async () => {
     try {
@@ -40,24 +52,33 @@ const AppliedJobs = () => {
     setOpenProfile(false);
   };
 
-  const handleProfileOpen = (candidate) => {
+  const handleProfileOpen = (candidate, application) => {
     setSelectedCandidate(candidate);
+    setSelectedApplication(application);
     setOpenProfile(true);
   };
 
   useEffect(() => {
-    const getUserApplications = async () => {
-      try {
-        const response = await getApplicationBySellerId();
-        if (response && response.data) {
-          setApplications(response.data);
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
 
-          const sellerIds = response.data.map(
-            (application) => application.sellerId,
-          );
-          const userIds = response.data.map(
-            (application) => application.userId,
-          );
+    const q = query(
+      collection(db, "applications"),
+      where("sellerId", "==", currentUser.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      try {
+        const apps = [];
+        querySnapshot.forEach((doc) => {
+          apps.push({ id: doc.id, ...doc.data() });
+        });
+        
+        setApplications(apps);
+
+        if (apps.length > 0) {
+          const sellerIds = apps.map((application) => application.sellerId);
+          const userIds = apps.map((application) => application.userId);
 
           const adminDetailsPromises = sellerIds.map((sellerId) =>
             getAdminsDetailsByAdminId(sellerId, "Employer"),
@@ -80,12 +101,12 @@ const AppliedJobs = () => {
           );
         }
       } catch (error) {
-        console.error("Error fetching applications:", error);
+        console.error("Error processing real-time applications:", error);
       }
-    };
+    });
 
-    getUserApplications();
-  }, [getApplicationBySellerId, getAdminsDetailsByAdminId]);
+    return () => unsubscribe();
+  }, [getAdminsDetailsByAdminId]);
 
   useEffect(() => {
     if (applications?.length > 0) {
@@ -173,7 +194,7 @@ const AppliedJobs = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => handleProfileOpen(candidateData[index])}
+                        onClick={() => handleProfileOpen(candidateData[index], application)}
                         className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
                       >
                         View profile
@@ -191,6 +212,7 @@ const AppliedJobs = () => {
           <CandidateProfile
             handleModalClose={handleModalClose}
             candidateData={selectedCandidate}
+            application={selectedApplication}
           />
         </ModalBox>
       )}

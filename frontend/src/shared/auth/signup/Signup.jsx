@@ -6,8 +6,10 @@ import { Link, useNavigate } from "react-router-dom";
 import coverimg from "../../../assets/logo.jpeg";
 import EmailVerify from "./EmailVerify";
 import { CircularLoader } from "../../../components";
+import { useBrandContext } from "../../../context";
 
 const Signup = () => {
+  const { siteConfig } = useBrandContext();
   const [step, setStep] = useState(1);
   const { RegisterUser, loading } = useAuthContext();
   const [formData, setFormData] = useState({
@@ -110,7 +112,7 @@ const Signup = () => {
 
         {/* Copyright */}
         <div className="text-center text-xs text-slate-400">
-          <p>All rights reserved by &copy; Career Techguru&trade;</p>
+          <p>All rights reserved by &copy; {siteConfig.appName}&trade;</p>
         </div>
       </div>
     </div>

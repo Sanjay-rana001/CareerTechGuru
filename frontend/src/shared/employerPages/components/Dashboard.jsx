@@ -21,9 +21,9 @@ const Dashboard = () => {
             <h3 className="h3 text-center">My Account</h3>
           </div>
           <div className="row">
-            <dov className="col-lg">
+            <div className="col-lg">
               <TabMenu tabs={tabs} children={children} />
-            </dov>
+            </div>
           </div>
         </div>
       </div>

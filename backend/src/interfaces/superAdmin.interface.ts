@@ -12,8 +12,8 @@ export interface ICandidateData {
   can_attend_walk_in_interview: string;
   current_salary: string;
   expected_salary: string;
-  interviewed_at_esps_before: string;
-  applied_at_esps_before: string;
+  interviewed_at_company_before: string;
+  applied_at_company_before: string;
   bound_by_current_company: string;
   notice_period: string;
   can_handle_multiple_work: string;

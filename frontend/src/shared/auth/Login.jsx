@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context";
 import coverImg from "../../assets/logo.jpeg";
 import { TextInput } from "../../components";
+import { useBrandContext } from "../../context";
 
 const Login = () => {
+  const { siteConfig } = useBrandContext();
   const { AuthenticateUser, loading } = useAuthContext();
   const navigate = useNavigate();
   const [loginCredentials, setLoginCredentials] = useState({
@@ -187,7 +189,7 @@ const Login = () => {
 
         {/* Copyright */}
         <div className="text-center text-xs text-slate-400">
-          <p>All rights reserved by &copy; Career Techguru&trade;</p>
+          <p>All rights reserved by &copy; {siteConfig.appName}&trade;</p>
         </div>
       </div>
     </div>

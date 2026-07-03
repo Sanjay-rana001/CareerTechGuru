@@ -13,6 +13,7 @@ import { CircularLoader } from "../components";
 const Home = React.lazy(() => import("../pages/Home"));
 const EmployeHome = React.lazy(() => import("../pages/Employee/EmployeHome"));
 const AdminHome = React.lazy(() => import("../pages/adminPages/AdminHome"));
+const BrandSettings = React.lazy(() => import("../pages/Admin/BrandSettings"));
 const Dashboard = React.lazy(
   () => import("../shared/employerPages/components/Dashboard"),
 );
@@ -70,6 +71,7 @@ const Index = () => {
         {role === "superadmin" && token ? (
           <Route element={<AdminLayout />}>
             <Route path="admin-dashboard" element={<AdminHome />} />
+            <Route path="brand-settings" element={<BrandSettings />} />
           </Route>
         ) : null}
       </Routes>

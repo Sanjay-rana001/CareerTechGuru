@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useAdminContext } from "../../../context";
 import { CircularLoader } from "../../../components";
 import { FaLinkedin, FaEnvelope, FaPhone, FaLink } from "react-icons/fa";
@@ -6,6 +6,9 @@ import UpdateInput from "../../../components/modal/UpdateInput";
 import { ModalBox } from "../../../components";
 import { Link } from "react-router-dom";
 import EmployerProfileForm from "../EmployerProfileForm";
+import { storage, db, auth } from "../../../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
 
 const EmployerProfile = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -15,6 +18,9 @@ const EmployerProfile = () => {
   const [data, setData] = useState([]);
   const user = JSON.parse(sessionStorage.getItem("data"));
   const [loading, setLoading] = useState(true);
+  
+  const profilePicInput = useRef(null);
+  const [uploadingPic, setUploadingPic] = useState(false);
 
   const getAdminProfileDetails = async () => {
     try {
@@ -26,6 +32,38 @@ const EmployerProfile = () => {
     } catch (error) {
       console.error(error);
       setLoading(false);
+    }
+  };
+
+  const handleProfilePicChange = async (e) => {
+    const picFile = e.target.files[0];
+    if (!picFile) return;
+    
+    setUploadingPic(true);
+    try {
+      const currentUser = auth.currentUser;
+      const adminId = user?.id || currentUser?.uid;
+      if (!adminId) throw new Error("Employer ID not found");
+
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, `profile_pictures/${adminId}/${picFile.name}`);
+      const snapshot = await uploadBytes(storageRef, picFile);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      // Update in employers collection
+      const employerRef = doc(db, "employers", adminId);
+      await setDoc(employerRef, { profilePicture: downloadURL }, { merge: true });
+      
+      // Update in users collection as well
+      await setDoc(doc(db, "users", adminId), { profilePictureUrl: downloadURL }, { merge: true });
+
+      alert("Company logo updated successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      alert("Failed to upload logo: " + error.message);
+    } finally {
+      setUploadingPic(false);
     }
   };
 
@@ -63,18 +101,35 @@ const EmployerProfile = () => {
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 mb-6">
           <div className="flex flex-col md:flex-row gap-6 justify-between items-center text-center md:text-left">
             <div className="flex flex-col md:flex-row items-center gap-4">
-              <div className="w-16 h-16 bg-slate-50 rounded-xl border border-slate-100 p-1 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div 
+                className="relative w-16 h-16 bg-slate-50 rounded-xl border border-slate-100 p-1 flex items-center justify-center overflow-hidden flex-shrink-0 cursor-pointer group"
+                onClick={() => profilePicInput.current?.click()}
+                title="Click to upload company logo"
+              >
                 {data?.profilePicture ? (
                   <img
                     src={data.profilePicture}
                     alt="Logo"
-                    className="max-h-full max-w-full object-contain"
+                    className={`max-h-full max-w-full object-contain ${uploadingPic ? 'opacity-50' : ''}`}
                   />
                 ) : (
                   <span className="text-xs text-slate-300 font-bold uppercase">
-                    CTG
+                    {uploadingPic ? "..." : "LOGO"}
                   </span>
                 )}
+                
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 flex items-center justify-center transition-all">
+                  <span className="text-white text-[10px] font-bold opacity-0 group-hover:opacity-100">
+                    {uploadingPic ? "UPLOADING..." : "UPLOAD"}
+                  </span>
+                </div>
+                <input 
+                  type="file" 
+                  ref={profilePicInput} 
+                  onChange={handleProfilePicChange} 
+                  className="hidden" 
+                  accept="image/png, image/jpeg, image/jpg"
+                />
               </div>
               <div className="space-y-1">
                 <h2 className="text-2xl font-bold text-slate-800 tracking-tight">

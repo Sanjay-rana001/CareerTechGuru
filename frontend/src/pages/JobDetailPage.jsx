@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useJobContext, useAdminContext } from "../context";
+import { useJobContext, useAdminContext, useBrandContext, useAuthContext } from "../context";
 import { useParams, useNavigate } from "react-router-dom";
 import { VscLinkExternal } from "react-icons/vsc";
 import { IoShareSocialSharp } from "react-icons/io5";
@@ -11,11 +11,14 @@ import { useQuery } from "@tanstack/react-query";
 
 const JobDetailPage = () => {
   const { getApplicationsByJobId, getAllApplications } = useJobContext();
-  const { createJobApplication } = useAdminContext();
+  const { createJobApplication, getApplicationByUserId } = useAdminContext();
+  const { token, user } = useAuthContext();
+  const { siteConfig } = useBrandContext();
   const { title } = useParams();
   const navigate = useNavigate();
   const [isConfirmBoxVisible, setConfirmBoxVisible] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
 
   // React Query refactor: caching the applications list and the specific job details
   const { data: allApplications, isLoading: loading } = useQuery({
@@ -28,6 +31,25 @@ const JobDetailPage = () => {
 
   const jobData = allApplications?.find((app) => app.title === title);
 
+  useEffect(() => {
+    const checkIfApplied = async () => {
+      if (token && jobData) {
+        try {
+          const res = await getApplicationByUserId();
+          if (res && res.data) {
+            const alreadyApplied = res.data.some(app => app.jobId === jobData.id);
+            if (alreadyApplied) {
+              setHasApplied(true);
+            }
+          }
+        } catch (error) {
+          console.error("Error checking application status:", error);
+        }
+      }
+    };
+    checkIfApplied();
+  }, [token, jobData]);
+
   const handleConfirm = () => {
     window.open(jobData?.jobUrl, "_blank", "noopener,noreferrer");
     setConfirmBoxVisible(false);
@@ -39,14 +61,22 @@ const JobDetailPage = () => {
       setIsApplying(true);
       
       const applicationData = {
-        jobId: jobData._id,
-        sellerId: jobData.adminId || jobData.postedBy,
-        title: jobData.title,
-        companyName: jobData.companyName,
-        category: jobData.category,
+        jobId: jobData.id,
+        sellerId: jobData.adminId || jobData.postedBy || "anonymous",
+        title: jobData.title || "Unknown Job",
+        companyName: jobData.companyName || "Unknown Company",
+        category: jobData.category || "General",
+        firstName: user?.firstName || "Unknown",
+        lastName: user?.lastName || "Unknown",
+        userEmail: user?.email || "Unknown",
+        userMobile: user?.mobile || "Unknown",
+        userCountry: user?.country || "Unknown",
       };
 
-      await createJobApplication(applicationData);
+      const res = await createJobApplication(applicationData);
+      if (res && res.status === 200) {
+        setHasApplied(true);
+      }
     } catch (error) {
       console.error("Error applying to job:", error);
     } finally {
@@ -83,11 +113,11 @@ const JobDetailPage = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-10">
       <Helmet>
-        <title>{`${jobData?.title || "Job Details"} | CareerTechGuru`}</title>
+        <title>{`${jobData?.title || "Job Details"} | ${siteConfig.appName}`}</title>
         <meta
           name="description"
           content={
-            jobData?.shortDescription || "View job details on CareerTechGuru."
+            jobData?.shortDescription || `View job details on ${siteConfig.appName}.`
           }
         />
         <meta
@@ -97,7 +127,7 @@ const JobDetailPage = () => {
         <meta
           property="og:description"
           content={
-            jobData?.shortDescription || "View job details on CareerTechGuru."
+            jobData?.shortDescription || `View job details on ${siteConfig.appName}.`
           }
         />
         <meta property="og:type" content="website" />
@@ -233,10 +263,10 @@ const JobDetailPage = () => {
               ) : (
                 <button 
                   onClick={handleApply}
-                  disabled={isApplying}
-                  className={`px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm rounded-lg border-0 transition-colors shadow-sm ${isApplying ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  disabled={isApplying || hasApplied}
+                  className={`px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm rounded-lg border-0 transition-colors shadow-sm ${(isApplying || hasApplied) ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  {isApplying ? "Applying..." : "Apply now"}
+                  {isApplying ? "Applying..." : hasApplied ? "Applied" : "Apply now"}
                 </button>
               )}
             </div>
@@ -268,6 +298,16 @@ const JobDetailPage = () => {
                 __html: DOMPurify.sanitize(jobData?.description),
               }}
             />
+          </div>
+
+          {/* About Company Block */}
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
+            <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
+              About {siteConfig.companyName}
+            </h3>
+            <p className="text-sm text-slate-600 leading-relaxed text-justify">
+              {siteConfig.aboutUsDescription}
+            </p>
           </div>
         </div>
       </div>

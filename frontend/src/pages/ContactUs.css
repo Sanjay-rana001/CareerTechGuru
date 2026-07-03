@@ -71,14 +71,14 @@
 .contact-us-page input[type="email"] {
   border-radius: 6px;
   padding: 10px;
-  width: 110%; /* Make input fields responsive */
+  width: 100%; /* Make input fields responsive */
   box-sizing: border-box;
 }
 
 .contact-us-page textarea[type="textarea"] {
   border-radius: 6px;
   padding: 10px;
-  width: 110%; /* Make textarea responsive */
+  width: 100%; /* Make textarea responsive */
   height: 80px; /* Adjust height */
 }
 
@@ -115,14 +115,14 @@
   .contact-us-page input[type="email"] {
     border-radius: 6px;
     padding: 10px;
-    width: 200%; /* Make input fields responsive */
+    width: 100%; /* Make input fields responsive */
     box-sizing: border-box;
   }
 
   .contact-us-page textarea[type="textarea"] {
     border-radius: 6px;
     padding: 10px;
-    width: 200%; /* Make textarea responsive */
+    width: 100%; /* Make textarea responsive */
     height: 80px; /* Adjust height */
   }
 }
@@ -136,14 +136,14 @@
   .contact-us-page input[type="email"] {
     border-radius: 6px;
     padding: 10px;
-    width: 110%; /* Make input fields responsive */
+    width: 100%; /* Make input fields responsive */
     box-sizing: border-box;
   }
 
   .contact-us-page textarea[type="textarea"] {
     border-radius: 6px;
     padding: 10px;
-    width: 110%; /* Make textarea responsive */
+    width: 100%; /* Make textarea responsive */
     height: 80px; /* Adjust height */
   }
 }

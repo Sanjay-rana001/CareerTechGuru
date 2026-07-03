@@ -7,11 +7,15 @@ import web from "../assets/domain.png";
 import mail from "../assets/email.png";
 import address from "../assets/location.png";
 import { TextInput } from "../components"; // Ensure you have this import path correct
+import { useBrandContext } from "../context";
 
 const ContactUs = () => {
-  const companyName = "ESPS Solutions";
-  const companyWebsite = "https://spsolutions.org.nz";
-  const Email = "info@espssolution.org.nz";
+  const { siteConfig } = useBrandContext();
+  const companyName = siteConfig.companyName;
+  const companyWebsite = siteConfig.contactWebsite;
+  const Email = siteConfig.contactEmail;
+  const Phone = siteConfig.contactPhone;
+  const Address = siteConfig.contactAddress;
   const [inputs, setInputs] = useState({
     name: "",
     phoneNumber: "",
@@ -76,75 +80,64 @@ const ContactUs = () => {
       <div className="contact-us-page">
         <div className="form-container">
           <div className="description-form">
-            <form onSubmit={handleSubmit} className="form">
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <tbody>
-                  <tr>
-                    <td style={{ padding: "10px", border: "transparent" }}>
-                      <label>
-                        Name:<sup className="text-danger">*</sup>
-                        <TextInput
-                          type="text"
-                          name="name"
-                          value={inputs.name}
-                          onChange={handleChange}
-                          placeholder="Name"
-                        />
-                      </label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: "10px", border: "transparent" }}>
-                      <label>
-                        Phone Number:<sup className="text-danger">*</sup>
-                        <TextInput
-                          type="text"
-                          name="phoneNumber"
-                          value={inputs.phoneNumber}
-                          onChange={handleChange}
-                          placeholder="Phone Number"
-                        />
-                      </label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: "10px", border: "transparent" }}>
-                      <label>
-                        Email:<sup className="text-danger">*</sup>
-                        <TextInput
-                          type="email"
-                          name="email"
-                          value={inputs.email}
-                          onChange={handleChange}
-                          placeholder="Email"
-                        />
-                      </label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: "10px", border: "transparent" }}>
-                      <label>
-                        Description:<sup className="text-danger">*</sup>
-                        <textarea
-                          type="textarea"
-                          name="description"
-                          value={inputs.description}
-                          onChange={handleChange}
-                          placeholder="Description/Queries"
-                          className="form-control"
-                        />
-                      </label>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ border: "transparent", textAlign: "center" }}>
-                      <button className="btn bg-prime text-light">
-                        Submit
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-sm font-semibold text-slate-700">
+                  Name<sup className="text-red-500">*</sup>
+                </label>
+                <TextInput
+                  type="text"
+                  name="name"
+                  value={inputs.name}
+                  onChange={handleChange}
+                  placeholder="Name"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-sm font-semibold text-slate-700">
+                  Phone Number<sup className="text-red-500">*</sup>
+                </label>
+                <TextInput
+                  type="text"
+                  name="phoneNumber"
+                  value={inputs.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="Phone Number"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-sm font-semibold text-slate-700">
+                  Email<sup className="text-red-500">*</sup>
+                </label>
+                <TextInput
+                  type="email"
+                  name="email"
+                  value={inputs.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-sm font-semibold text-slate-700">
+                  Description<sup className="text-red-500">*</sup>
+                </label>
+                <textarea
+                  name="description"
+                  value={inputs.description}
+                  onChange={handleChange}
+                  placeholder="Description/Queries"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all duration-200 resize-y min-h-[100px]"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button type="submit" className="w-full sm:w-auto px-8 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-colors text-sm border-0 cursor-pointer">
+                  Submit
+                </button>
+              </div>
             </form>
           </div>
           <div className="contact-info">
@@ -156,7 +149,7 @@ const ContactUs = () => {
                 className="Image"
                 alt="Phone"
               />
-              <h3>9871729030</h3>
+              <h3 className="text-lg font-semibold">{Phone}</h3>
               <p>
                 <strong>Company Name:</strong> {companyName}
               </p>
@@ -169,9 +162,8 @@ const ContactUs = () => {
                 className="Image"
                 alt="Address"
               />
-              <p>
-                Achievers Centre Point Mall, Sector-49, Office No. 15/19 First
-                Floor Faridabad, Haryana, 121001 INDIA
+              <p className="text-sm">
+                {Address}
               </p>
             </div>
             <div className="contact-item">

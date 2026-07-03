@@ -8,8 +8,10 @@ import { GiBrain, GiElvenCastle, GiPuzzle } from "react-icons/gi";
 import { FiMessageSquare } from "react-icons/fi";
 import { MdCelebration } from "react-icons/md";
 import banner from "../assets/logo.jpeg";
+import { useBrandContext } from "../context";
 
 const Home = () => {
+  const { siteConfig } = useBrandContext();
   const { getCompanyList, getJobSingleDetail } = useJobContext();
   const [companyListDetails, setCompanyListDetails] = useState([]);
   const [jobLocations, setJobLocations] = useState([]);
@@ -51,7 +53,7 @@ const Home = () => {
             <span className="text-[#2563EB]">Job Seekers</span>
           </h1>
           <p className="text-base md:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-            Welcome to Career tech guru, the ultimate destination for employers
+            Welcome to {siteConfig.appName}, the ultimate destination for employers
             and job seekers. Whether you're looking to hire top talent or
             searching for your dream job, we provide a seamless and efficient
             platform to connect the right people with the right opportunities.
@@ -74,7 +76,7 @@ const Home = () => {
               What we do
             </h4>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-snug">
-              Career Techguru matches awesome people with{" "}
+              {siteConfig.appName} matches awesome people with{" "}
               <span className="text-[#2563EB]">awesome jobs.</span>
             </h2>
             <ul className="space-y-4 p-0 list-none">

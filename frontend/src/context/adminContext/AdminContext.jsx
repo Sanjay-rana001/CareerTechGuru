@@ -76,8 +76,16 @@ const AdminContextProvider = ({ children }) => {
         "applications",
         `${currentUser.uid}_${data.jobId}`,
       );
-      const docSnap = await getDoc(appRef);
-      if (docSnap.exists()) {
+
+      const q = query(
+        collection(db, "applications"),
+        where("userId", "==", currentUser.uid),
+        where("jobId", "==", data.jobId)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
         toast.error(
           "You have already applied for this job. Please wait for a response.",
         );

@@ -9,6 +9,7 @@ const AddJobForm_2 = ({
   values,
 }) => {
   const [isReferenceJob, setIsReferenceJob] = useState(values.isReferenceJob);
+  const [isUploading, setIsUploading] = useState(false);
   const [locationOptions, setLocationOptions] = useState([]);
 
   useEffect(() => {
@@ -27,6 +28,29 @@ const AddJobForm_2 = ({
     handleChange("isReferenceJob")({ target: { value } });
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const { storage } = await import("../../../../firebase");
+      const { ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
+      
+      const fileRef = ref(storage, \`companyLogos/\${Date.now()}_\${file.name}\`);
+      await uploadBytes(fileRef, file);
+      const downloadUrl = await getDownloadURL(fileRef);
+      
+      // Update the profilePicture value
+      handleChange("profilePicture")({ target: { value: downloadUrl } });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
@@ -38,8 +62,22 @@ const AddJobForm_2 = ({
         <div className="p-8 space-y-6">
           {/* Company Logo */}
           <div>
-            <label htmlFor="profilePicture" className="block text-sm font-semibold text-gray-700 mb-2">Company Logo URL <span className="text-red-500">*</span></label>
-            <input type="text" onChange={handleChange("profilePicture")} value={values.profilePicture} placeholder="https://example.com/logo.png" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm outline-none" />
+            <label htmlFor="profilePicture" className="block text-sm font-semibold text-gray-700 mb-2">Company Logo <span className="text-red-500">*</span></label>
+            <div className="flex items-center gap-4">
+              {values.profilePicture && (
+                <img src={values.profilePicture} alt="Logo preview" className="w-16 h-16 object-contain rounded-md border border-gray-200" />
+              )}
+              <div className="flex-1">
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={handleImageUpload} 
+                  disabled={isUploading}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
+                />
+                {isUploading && <p className="text-sm text-blue-600 mt-2">Uploading image...</p>}
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

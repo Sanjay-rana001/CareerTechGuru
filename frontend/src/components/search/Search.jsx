@@ -50,7 +50,8 @@ const Search = ({ categories }) => {
   useEffect(() => {
     fetchJobLocations();
     fetchInitialJobs();
-  }, [searchJobQuery, setSearchResult]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams();

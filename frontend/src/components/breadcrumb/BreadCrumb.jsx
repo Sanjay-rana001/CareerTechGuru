@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const BreadCrumb = () => {
-  return (
-    <div>BreadCrumb</div>
-  )
-}
+  return <div>BreadCrumb</div>;
+};
 
-export default BreadCrumb
+export default BreadCrumb;

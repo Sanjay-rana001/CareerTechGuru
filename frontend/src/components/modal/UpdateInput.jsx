@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { useEmployeeContext } from '../../context';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { useEmployeeContext } from "../../context";
 
 const UpdateInput = ({ title, field, onUpdate }) => {
   const { updateEmployeeDetails } = useEmployeeContext();
@@ -12,8 +12,8 @@ const UpdateInput = ({ title, field, onUpdate }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const userEmail = JSON.parse(sessionStorage.getItem('data'));
-    
+    const userEmail = JSON.parse(sessionStorage.getItem("data"));
+
     if (!userEmail?.email) {
       console.error("User email is not available");
       return;
@@ -30,19 +30,25 @@ const UpdateInput = ({ title, field, onUpdate }) => {
   };
 
   return (
-    <div className='col-lg-12 justify-center items-center bg-white rounded py-7'>
-      <h2 className='h3 text-prime'>Update</h2>
-      <form className='form-group' onSubmit={handleSubmit}>
-        <label htmlFor="updateTitle" className='form-label'>Title</label>
+    <div className="col-lg-12 justify-center items-center bg-white rounded py-7">
+      <h2 className="h3 text-prime">Update</h2>
+      <form className="form-group" onSubmit={handleSubmit}>
+        <label htmlFor="updateTitle" className="form-label">
+          Title
+        </label>
         <input
           type="text"
           id="updateTitle"
           value={inputValue}
           onChange={handleChange}
-          className='form-control'
+          className="form-control"
           aria-label="Title"
         />
-        <button type="submit" className='btn justify-center w-28 mt-3 text-light' style={{ backgroundColor: '#0F79AF' }}>
+        <button
+          type="submit"
+          className="btn justify-center w-28 mt-3 text-light"
+          style={{ backgroundColor: "#0F79AF" }}
+        >
           Update
         </button>
       </form>
@@ -53,11 +59,11 @@ const UpdateInput = ({ title, field, onUpdate }) => {
 UpdateInput.propTypes = {
   title: PropTypes.string,
   field: PropTypes.string.isRequired,
-  onUpdate: PropTypes.func.isRequired
+  onUpdate: PropTypes.func.isRequired,
 };
 
 UpdateInput.defaultProps = {
-  title: ''
+  title: "",
 };
 
 export default UpdateInput;

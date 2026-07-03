@@ -3,7 +3,7 @@ import FormStepOne from "./FormStepOne";
 import FormStepTwo from "./FormStepTwo";
 import { useAuthContext } from "../../../context";
 import { Link, useNavigate } from "react-router-dom";
-import coverimg from '../../../assets/logo.jpeg';
+import coverimg from "../../../assets/logo.jpeg";
 import EmailVerify from "./EmailVerify";
 import { CircularLoader } from "../../../components";
 
@@ -15,18 +15,18 @@ const Signup = () => {
     lastName: "",
     email: "",
     mobile: "",
-    username : "",
-    country : "",
+    username: "",
+    country: "",
     password: "",
     role: "",
     resumeUrl: "",
   });
- 
+
   const navigate = useNavigate();
- 
+
   const nextStep = () => setStep((prevStep) => prevStep + 1);
   const prevStep = () => setStep((prevStep) => prevStep - 1);
- 
+
   const handleInputData = (input) => (e) => {
     const { value } = e.target;
     setFormData((prevState) => ({
@@ -34,7 +34,7 @@ const Signup = () => {
       [input]: value,
     }));
   };
- 
+
   const handleSubmit = async () => {
     try {
       const userData = await RegisterUser(formData);
@@ -47,8 +47,8 @@ const Signup = () => {
       console.error("Error during registration:", error);
     }
   };
- 
-  if (loading) { 
+
+  if (loading) {
     return <CircularLoader />;
   }
 
@@ -58,11 +58,20 @@ const Signup = () => {
         <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-8">
           {/* Logo & Header */}
           <div className="flex flex-col items-center justify-center mb-6">
-            <img src={coverimg} alt="Logo" className="w-16 h-16 rounded-xl object-cover mb-4 border border-slate-100 shadow-sm" />
-            <h2 className="text-center text-2xl font-bold text-slate-800">Register your account</h2>
+            <img
+              src={coverimg}
+              alt="Logo"
+              className="w-16 h-16 rounded-xl object-cover mb-4 border border-slate-100 shadow-sm"
+            />
+            <h2 className="text-center text-2xl font-bold text-slate-800">
+              Register your account
+            </h2>
             <p className="text-xs text-slate-500 mt-2">
               Already have an account?{" "}
-              <Link to="/login" className="text-[#2563EB] font-bold no-underline hover:underline">
+              <Link
+                to="/login"
+                className="text-[#2563EB] font-bold no-underline hover:underline"
+              >
                 Login here
               </Link>
             </p>
@@ -107,5 +116,5 @@ const Signup = () => {
     </div>
   );
 };
- 
+
 export default Signup;

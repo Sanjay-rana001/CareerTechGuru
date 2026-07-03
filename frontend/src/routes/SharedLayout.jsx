@@ -14,8 +14,8 @@ const SharedLayout = () => {
       clearTimeout(id);
     };
   }, []);
-  if(loadingData) {
-    return ( <CircularLoader/>)
+  if (loadingData) {
+    return <CircularLoader />;
   }
   return (
     <>

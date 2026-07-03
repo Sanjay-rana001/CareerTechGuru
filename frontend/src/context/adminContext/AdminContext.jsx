@@ -1,37 +1,41 @@
-import React, { createContext, useEffect } from 'react';
-import { db, auth } from '../../firebase';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  collection, 
-  query, 
-  where, 
+import React, { createContext, useEffect } from "react";
+import { db, auth } from "../../firebase";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  query,
+  where,
   getDocs,
   limit,
   orderBy,
-  startAfter
-} from 'firebase/firestore';
-import toast from 'react-hot-toast';
+  startAfter,
+} from "firebase/firestore";
+import toast from "react-hot-toast";
 
 export const AdminContext = createContext();
 
 const AdminContextProvider = ({ children }) => {
-  const user = JSON.parse(sessionStorage.getItem('data'));
+  const user = JSON.parse(sessionStorage.getItem("data"));
 
   // Function to add admin profile details
   const addAdminProfleDetail = async (data) => {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) return;
-      
-      await setDoc(doc(db, "profiles", currentUser.uid), {
-        ...data,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+
+      await setDoc(
+        doc(db, "profiles", currentUser.uid),
+        {
+          ...data,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true },
+      );
       toast.success("Profile updated successfully");
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
       toast.error("Failed to update profile. Please try again.");
     }
   };
@@ -42,7 +46,7 @@ const AdminContextProvider = ({ children }) => {
       const docSnap = await getDoc(doc(db, "profiles", adminId));
       return docSnap;
     } catch (error) {
-      console.error('Error fetching admin details:', error);
+      console.error("Error fetching admin details:", error);
       throw error;
     }
   };
@@ -55,21 +59,27 @@ const AdminContextProvider = ({ children }) => {
         toast.error("Please login to apply.");
         return;
       }
-      
-      const appRef = doc(db, "applications", `${currentUser.uid}_${data.jobId}`);
+
+      const appRef = doc(
+        db,
+        "applications",
+        `${currentUser.uid}_${data.jobId}`,
+      );
       const docSnap = await getDoc(appRef);
       if (docSnap.exists()) {
-        toast.error("You have already applied for this job. Please wait for a response.");
+        toast.error(
+          "You have already applied for this job. Please wait for a response.",
+        );
         return;
       }
 
       await setDoc(appRef, {
         userId: currentUser.uid,
         jobId: data.jobId,
-        sellerId: data.sellerId || data.postedBy || 'anonymous',
+        sellerId: data.sellerId || data.postedBy || "anonymous",
         appliedAt: new Date().toISOString(),
         status: "pending",
-        ...data
+        ...data,
       });
 
       toast.success("Applied successfully");
@@ -86,7 +96,10 @@ const AdminContextProvider = ({ children }) => {
       const currentUser = auth.currentUser;
       if (!currentUser) return { data: [] };
 
-      const q = query(collection(db, "applications"), where("userId", "==", currentUser.uid));
+      const q = query(
+        collection(db, "applications"),
+        where("userId", "==", currentUser.uid),
+      );
       const querySnapshot = await getDocs(q);
       const apps = [];
       querySnapshot.forEach((doc) => {
@@ -105,7 +118,10 @@ const AdminContextProvider = ({ children }) => {
       const currentUser = auth.currentUser;
       if (!currentUser) return { data: [] };
 
-      const q = query(collection(db, "applications"), where("sellerId", "==", currentUser.uid));
+      const q = query(
+        collection(db, "applications"),
+        where("sellerId", "==", currentUser.uid),
+      );
       const querySnapshot = await getDocs(q);
       const apps = [];
       querySnapshot.forEach((doc) => {
@@ -123,23 +139,32 @@ const AdminContextProvider = ({ children }) => {
     try {
       // Assuming users collection doesn't have createdAt reliably, we can just paginate by document ID or a specific field.
       // Firestore requires an orderBy to use startAfter. We'll use email as a reliable alphabetical sort.
-      let q = query(collection(db, "users"), orderBy("email"), limit(limitCount));
-      
+      let q = query(
+        collection(db, "users"),
+        orderBy("email"),
+        limit(limitCount),
+      );
+
       if (lastVisible) {
-        q = query(collection(db, "users"), orderBy("email"), startAfter(lastVisible), limit(limitCount));
+        q = query(
+          collection(db, "users"),
+          orderBy("email"),
+          startAfter(lastVisible),
+          limit(limitCount),
+        );
       }
-      
+
       const querySnapshot = await getDocs(q);
       const allUsers = [];
       querySnapshot.forEach((doc) => {
         allUsers.push({ id: doc.id, ...doc.data() });
       });
-      
+
       const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-      
+
       return { data: allUsers, lastDoc };
     } catch (error) {
-      console.error('Error fetching global users:', error);
+      console.error("Error fetching global users:", error);
       return { data: [], lastDoc: null };
     }
   };
@@ -147,20 +172,26 @@ const AdminContextProvider = ({ children }) => {
   // Fetch initial data when the component mounts
   useEffect(() => {
     if (user && user._id) {
-      getApplicationByUserId().catch(error => console.error("Error in useEffect:", error));
-      getApplicationBySellerId().catch(error => console.error("Error in useEffect:", error));
+      getApplicationByUserId().catch((error) =>
+        console.error("Error in useEffect:", error),
+      );
+      getApplicationBySellerId().catch((error) =>
+        console.error("Error in useEffect:", error),
+      );
     }
   }, [user]);
 
   return (
-    <AdminContext.Provider value={{
-      getAdminsDetailsByAdminId,
-      addAdminProfleDetail,
-      createJobApplication,
-      getApplicationByUserId,
-      getApplicationBySellerId,
-      getGlobalUsers
-    }}>
+    <AdminContext.Provider
+      value={{
+        getAdminsDetailsByAdminId,
+        addAdminProfleDetail,
+        createJobApplication,
+        getApplicationByUserId,
+        getApplicationBySellerId,
+        getGlobalUsers,
+      }}
+    >
       {children}
     </AdminContext.Provider>
   );

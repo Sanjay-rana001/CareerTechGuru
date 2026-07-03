@@ -1,21 +1,21 @@
-import React, { useState, useRef } from 'react';
-import { convertTimeIntoMMYYYY } from '../../../utils/dateFilter/DateFilter';
-import { FaBook, FaGithub, FaLinkedin } from 'react-icons/fa';
-import { FaXTwitter } from 'react-icons/fa6';
-import { TbWorldWww  } from 'react-icons/tb';
-import { VscLinkExternal } from 'react-icons/vsc';
-import UpdateInput from '../../../components/modal/UpdateInput';
-import { ModalBox } from '../../../components';
-import { storage, db, auth } from '../../../firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, setDoc } from 'firebase/firestore';
+import React, { useState, useRef } from "react";
+import { convertTimeIntoMMYYYY } from "../../../utils/dateFilter/DateFilter";
+import { FaBook, FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { TbWorldWww } from "react-icons/tb";
+import { VscLinkExternal } from "react-icons/vsc";
+import UpdateInput from "../../../components/modal/UpdateInput";
+import { ModalBox } from "../../../components";
+import { storage, db, auth } from "../../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
 
 const ProfilePage = ({ data }) => {
   const [openModal, setOpenModal] = useState(false);
-  const [currentField, setCurrentField] = useState('');
-  const [currentValue, setCurrentValue] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [currentField, setCurrentField] = useState("");
+  const [currentValue, setCurrentValue] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [file, setFile] = useState(null);
   const fileInput = useRef(null);
 
@@ -25,19 +25,19 @@ const ProfilePage = ({ data }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
-    setSuccessMessage('');
-  
+    setErrorMessage("");
+    setSuccessMessage("");
+
     if (!file) {
-      setErrorMessage('Please select a file to upload.');
+      setErrorMessage("Please select a file to upload.");
       return;
     }
-  
+
     try {
       const currentUser = auth.currentUser;
       const userEmail = data?.email || (currentUser ? currentUser.email : null);
       if (!userEmail) {
-        setErrorMessage('User email not found. Please log in again.');
+        setErrorMessage("User email not found. Please log in again.");
         return;
       }
 
@@ -50,12 +50,12 @@ const ProfilePage = ({ data }) => {
       const profileRef = doc(db, "profiles", userEmail);
       await setDoc(profileRef, { resumeUrl: downloadURL }, { merge: true });
 
-      setSuccessMessage('File uploaded successfully.');
-      alert('File uploaded successfully.');
+      setSuccessMessage("File uploaded successfully.");
+      alert("File uploaded successfully.");
       window.location.reload();
     } catch (error) {
-      console.error('Error uploading resume:', error);
-      setErrorMessage('Error in setting up the request: ' + error.message);
+      console.error("Error uploading resume:", error);
+      setErrorMessage("Error in setting up the request: " + error.message);
     }
   };
 
@@ -101,33 +101,73 @@ const ProfilePage = ({ data }) => {
             {/* Social Links Row */}
             <div className="flex gap-4">
               {data?.links?.website && (
-                <a href={data.links.website} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline" title="Website">
+                <a
+                  href={data.links.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline"
+                  title="Website"
+                >
                   <TbWorldWww size={24} />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Web</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    Web
+                  </span>
                 </a>
               )}
               {data?.links?.github && (
-                <a href={data.links.github} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline" title="GitHub">
+                <a
+                  href={data.links.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline"
+                  title="GitHub"
+                >
                   <FaGithub size={24} />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Git</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    Git
+                  </span>
                 </a>
               )}
               {data?.links?.linkedin && (
-                <a href={data.links.linkedin} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline" title="LinkedIn">
+                <a
+                  href={data.links.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline"
+                  title="LinkedIn"
+                >
                   <FaLinkedin size={24} />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">In</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    In
+                  </span>
                 </a>
               )}
               {data?.links?.twitter && (
-                <a href={data.links.twitter} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline" title="Twitter">
+                <a
+                  href={data.links.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline"
+                  title="Twitter"
+                >
                   <FaXTwitter size={24} />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">X</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    X
+                  </span>
                 </a>
               )}
               {data?.links?.portfolio && (
-                <a href={data.links.portfolio} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline" title="Portfolio">
+                <a
+                  href={data.links.portfolio}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-400 hover:text-[#2563EB] transition-colors flex flex-col items-center gap-1 no-underline"
+                  title="Portfolio"
+                >
                   <FaBook size={24} />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Port</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    Port
+                  </span>
                 </a>
               )}
             </div>
@@ -143,16 +183,28 @@ const ProfilePage = ({ data }) => {
               </h3>
               <div className="space-y-6">
                 {data.experiences.map((exp, idx) => (
-                  <div key={idx} className="flex flex-col md:flex-row gap-4 justify-between items-start">
+                  <div
+                    key={idx}
+                    className="flex flex-col md:flex-row gap-4 justify-between items-start"
+                  >
                     <div className="space-y-1">
-                      <h4 className="text-base font-bold text-slate-800 mb-0">{exp?.title}</h4>
-                      <p className="text-sm font-medium text-slate-500 mb-0">{exp?.company}</p>
+                      <h4 className="text-base font-bold text-slate-800 mb-0">
+                        {exp?.title}
+                      </h4>
+                      <p className="text-sm font-medium text-slate-500 mb-0">
+                        {exp?.company}
+                      </p>
                       {exp?.description && (
-                        <p className="text-sm text-slate-600 mt-2 leading-relaxed whitespace-pre-line">{exp.description}</p>
+                        <p className="text-sm text-slate-600 mt-2 leading-relaxed whitespace-pre-line">
+                          {exp.description}
+                        </p>
                       )}
                     </div>
                     <div className="text-xs font-semibold text-slate-400 whitespace-nowrap bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg">
-                      {convertTimeIntoMMYYYY(exp?.startDate)} &mdash; {exp?.isActive ? 'Present' : convertTimeIntoMMYYYY(exp?.endDate)}
+                      {convertTimeIntoMMYYYY(exp?.startDate)} &mdash;{" "}
+                      {exp?.isActive
+                        ? "Present"
+                        : convertTimeIntoMMYYYY(exp?.endDate)}
                     </div>
                   </div>
                 ))}
@@ -168,16 +220,28 @@ const ProfilePage = ({ data }) => {
               </h3>
               <div className="space-y-6">
                 {data.education.map((edu, idx) => (
-                  <div key={idx} className="flex flex-col md:flex-row gap-4 justify-between items-start">
+                  <div
+                    key={idx}
+                    className="flex flex-col md:flex-row gap-4 justify-between items-start"
+                  >
                     <div className="space-y-1">
-                      <h4 className="text-base font-bold text-slate-800 mb-0">{edu?.title}</h4>
-                      <p className="text-sm font-medium text-slate-500 mb-0">{edu?.university}</p>
+                      <h4 className="text-base font-bold text-slate-800 mb-0">
+                        {edu?.title}
+                      </h4>
+                      <p className="text-sm font-medium text-slate-500 mb-0">
+                        {edu?.university}
+                      </p>
                       {edu?.marks && (
-                        <p className="text-xs font-semibold text-slate-600 mt-2">Score: {edu.marks}</p>
+                        <p className="text-xs font-semibold text-slate-600 mt-2">
+                          Score: {edu.marks}
+                        </p>
                       )}
                     </div>
                     <div className="text-xs font-semibold text-slate-400 whitespace-nowrap bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg">
-                      {convertTimeIntoMMYYYY(edu?.startDate)} &mdash; {edu?.isActive ? 'Present' : convertTimeIntoMMYYYY(edu?.endDate)}
+                      {convertTimeIntoMMYYYY(edu?.startDate)} &mdash;{" "}
+                      {edu?.isActive
+                        ? "Present"
+                        : convertTimeIntoMMYYYY(edu?.endDate)}
                     </div>
                   </div>
                 ))}
@@ -195,20 +259,25 @@ const ProfilePage = ({ data }) => {
               <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl mb-4 text-sm text-slate-600 space-y-1.5">
                 <p className="mb-0">
                   Your current resume:{" "}
-                  <a 
-                    className="text-[#2563EB] font-bold no-underline hover:underline inline-flex items-center gap-1" 
-                    href={data.resumeUrl} 
-                    target="_blank" 
+                  <a
+                    className="text-[#2563EB] font-bold no-underline hover:underline inline-flex items-center gap-1"
+                    href={data.resumeUrl}
+                    target="_blank"
                     rel="noopener noreferrer"
                   >
                     View / Download Resume <VscLinkExternal size={12} />
                   </a>
                 </p>
-                <p className="text-xs text-slate-400 mb-0">If you want to upload a different resume, select a new file below.</p>
+                <p className="text-xs text-slate-400 mb-0">
+                  If you want to upload a different resume, select a new file
+                  below.
+                </p>
               </div>
             ) : (
               <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl mb-4 text-sm text-slate-600">
-                <p className="mb-0 text-xs text-slate-400">No resume uploaded yet. Please upload your resume below.</p>
+                <p className="mb-0 text-xs text-slate-400">
+                  No resume uploaded yet. Please upload your resume below.
+                </p>
               </div>
             )}
 
@@ -224,8 +293,8 @@ const ProfilePage = ({ data }) => {
                 <span className="text-xs font-semibold text-slate-400">
                   Supported formats: .doc, .docx, .pdf
                 </span>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="px-6 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold rounded-lg border-0 transition-colors cursor-pointer shadow-sm"
                 >
                   Upload Resume

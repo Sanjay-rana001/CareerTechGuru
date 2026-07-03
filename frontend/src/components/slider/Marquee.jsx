@@ -1,12 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
 const Marquee = ({ images, speed }) => {
   return (
     <div className="marquee">
-      <div className="marquee-content" style={{ animationDuration: `${speed}s` }}>
+      <div
+        className="marquee-content"
+        style={{ animationDuration: `${speed}s` }}
+      >
         {images?.map((image, index) => (
-          <img key={index} src={image?.src} alt={image.alt} className="marquee-image" />
+          <img
+            key={index}
+            src={image?.src}
+            alt={image.alt}
+            className="marquee-image"
+          />
         ))}
       </div>
     </div>

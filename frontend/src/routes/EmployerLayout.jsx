@@ -1,14 +1,14 @@
-import React from 'react'
-import { EmployerHeader, Navbar } from '../components'
-import { Outlet } from 'react-router-dom'
+import React from "react";
+import { EmployerHeader, Navbar } from "../components";
+import { Outlet } from "react-router-dom";
 
 const EmployerLayout = () => {
   return (
     <>
-        <Navbar />
-        <Outlet />
+      <Navbar />
+      <Outlet />
     </>
-  )
-}
+  );
+};
 
-export default EmployerLayout
+export default EmployerLayout;

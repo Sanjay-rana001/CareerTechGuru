@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 import { FaAngleDown } from "react-icons/fa";
 
 const Dropdown = ({ options, placeholder, dismiss }) => {
@@ -15,9 +15,9 @@ const Dropdown = ({ options, placeholder, dismiss }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -28,7 +28,10 @@ const Dropdown = ({ options, placeholder, dismiss }) => {
 
   return (
     <div className="dropdown" ref={dropdownRef}>
-      <div className="dropdown-header flex items-center justify-between gap-2 nav-link text-dark" onClick={() => setIsOpen(!isOpen)}>
+      <div
+        className="dropdown-header flex items-center justify-between gap-2 nav-link text-dark"
+        onClick={() => setIsOpen(!isOpen)}
+      >
         {placeholder} <FaAngleDown />
       </div>
       {isOpen && (
@@ -37,8 +40,8 @@ const Dropdown = ({ options, placeholder, dismiss }) => {
             <div
               key={index}
               className="dropdown-item nav-link"
-              onClick={() => handleOptionSelect(option. path)}
-              data-bs-dismiss={dismiss} 
+              onClick={() => handleOptionSelect(option.path)}
+              data-bs-dismiss={dismiss}
             >
               {option.label}
             </div>
@@ -54,13 +57,13 @@ Dropdown.propTypes = {
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       path: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   placeholder: PropTypes.string,
 };
 
 Dropdown.defaultProps = {
-  placeholder: 'Select an option',
+  placeholder: "Select an option",
 };
 
 export default Dropdown;

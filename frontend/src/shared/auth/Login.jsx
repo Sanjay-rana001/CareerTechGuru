@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context";
-import coverImg from '../../assets/logo.jpeg';
+import coverImg from "../../assets/logo.jpeg";
 import { TextInput } from "../../components";
 
 const Login = () => {
@@ -15,7 +15,7 @@ const Login = () => {
     email: false,
     password: false,
   });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [passwordToggle, setPasswordToggle] = useState(false);
 
   const validateFormInput = () => {
@@ -50,7 +50,7 @@ const Login = () => {
       } catch (error) {
         setErrorMessage(error.message);
         setTimeout(() => {
-          setErrorMessage('');
+          setErrorMessage("");
         }, 3000);
       }
     }
@@ -62,8 +62,14 @@ const Login = () => {
         <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-8">
           {/* Logo & Header */}
           <div className="flex flex-col items-center justify-center mb-6">
-            <img src={coverImg} alt="Logo" className="w-16 h-16 rounded-xl object-cover mb-4 border border-slate-100 shadow-sm" />
-            <h2 className="text-center text-2xl font-bold text-slate-800">Login here</h2>
+            <img
+              src={coverImg}
+              alt="Logo"
+              className="w-16 h-16 rounded-xl object-cover mb-4 border border-slate-100 shadow-sm"
+            />
+            <h2 className="text-center text-2xl font-bold text-slate-800">
+              Login here
+            </h2>
           </div>
 
           {errorMessage && (
@@ -78,16 +84,18 @@ const Login = () => {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Username or Email <sup className="text-red-500">*</sup>
               </label>
-              <TextInput 
-                type="text" 
-                name="email" 
-                value={loginCredentials.email} 
-                onChange={handleInputChange} 
-                placeholder="Enter Username or Email" 
+              <TextInput
+                type="text"
+                name="email"
+                value={loginCredentials.email}
+                onChange={handleInputChange}
+                placeholder="Enter Username or Email"
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
               />
               {formError.email && (
-                <span className="text-xs font-medium text-red-500">Username or Email is required</span>
+                <span className="text-xs font-medium text-red-500">
+                  Username or Email is required
+                </span>
               )}
             </div>
 
@@ -96,27 +104,32 @@ const Login = () => {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Password <sup className="text-red-500">*</sup>
               </label>
-              <TextInput 
-                type={passwordToggle ? "text" : "password"} 
-                name="password" 
-                value={loginCredentials.password} 
-                onChange={handleInputChange} 
-                placeholder="Enter Password" 
+              <TextInput
+                type={passwordToggle ? "text" : "password"}
+                name="password"
+                value={loginCredentials.password}
+                onChange={handleInputChange}
+                placeholder="Enter Password"
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-colors"
               />
               {formError.password && (
-                <span className="text-xs font-medium text-red-500">Password is required</span>
+                <span className="text-xs font-medium text-red-500">
+                  Password is required
+                </span>
               )}
-              
+
               <div className="flex items-center gap-2 mt-1">
-                <input 
-                  type="checkbox" 
-                  checked={passwordToggle} 
-                  onChange={handlePasswordToggle} 
-                  id="flexCheckDefault" 
+                <input
+                  type="checkbox"
+                  checked={passwordToggle}
+                  onChange={handlePasswordToggle}
+                  id="flexCheckDefault"
                   className="rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB]"
                 />
-                <label className="text-xs font-medium text-slate-500 cursor-pointer select-none" htmlFor="flexCheckDefault">
+                <label
+                  className="text-xs font-medium text-slate-500 cursor-pointer select-none"
+                  htmlFor="flexCheckDefault"
+                >
                   show password
                 </label>
               </div>
@@ -124,17 +137,17 @@ const Login = () => {
 
             {/* Action buttons */}
             <div className="flex flex-col gap-3 pt-2">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-semibold py-3 rounded-lg border-0 shadow-sm transition-colors text-sm"
                 disabled={loading}
               >
                 {loading ? "Please wait..." : "Login"}
               </button>
-              
-              <button 
+
+              <button
                 type="button"
-                onClick={() => navigate('/')} 
+                onClick={() => navigate("/")}
                 className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-lg border-0 transition-colors text-xs"
               >
                 Back to home
@@ -145,18 +158,27 @@ const Login = () => {
           {/* Links */}
           <div className="mt-6 pt-6 border-t border-slate-100 space-y-2.5 text-xs text-center">
             <p className="mb-0 text-slate-500">
-              <Link to='/forgot-password' className="text-[#2563EB] font-medium no-underline hover:underline">
+              <Link
+                to="/forgot-password"
+                className="text-[#2563EB] font-medium no-underline hover:underline"
+              >
                 Forgot Password?
               </Link>
             </p>
             <p className="mb-0 text-slate-500">
               Don't have an account?{" "}
-              <Link to="/register" className="text-[#2563EB] font-bold no-underline hover:underline">
+              <Link
+                to="/register"
+                className="text-[#2563EB] font-bold no-underline hover:underline"
+              >
                 Create an account
               </Link>
             </p>
             <p className="mb-0">
-              <Link to="/contact-us" className="text-slate-400 no-underline hover:underline">
+              <Link
+                to="/contact-us"
+                className="text-slate-400 no-underline hover:underline"
+              >
                 Need help signing in?
               </Link>
             </p>

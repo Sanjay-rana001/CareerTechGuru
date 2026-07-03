@@ -6,26 +6,32 @@ export const usePagination = (items, pageLimit) => {
 
   const changePage = (pN) => {
     setPageNumber(pN);
-  }
+  };
 
   const pageData = () => {
     const s = pageNumber * pageLimit;
     const e = s + pageLimit;
     return items.slice(s, e);
-  }
+  };
 
   const nextPage = () => {
     if (pageNumber < pageCount) {
       setPageNumber(pageNumber + 1);
     }
-  }
+  };
 
   const previousPage = () => {
     if (pageNumber > 1) {
       setPageNumber(pageNumber - 1);
     }
-  }
+  };
 
-  return { pageNumber, pageCount, changePage, pageData, nextPage, previousPage };
-}
-
+  return {
+    pageNumber,
+    pageCount,
+    changePage,
+    pageData,
+    nextPage,
+    previousPage,
+  };
+};

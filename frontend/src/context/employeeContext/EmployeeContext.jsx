@@ -1,12 +1,11 @@
-import React, { createContext } from 'react';
-import { db, auth } from '../../firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import toast from 'react-hot-toast';
+import React, { createContext } from "react";
+import { db, auth } from "../../firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 export const EmployeeContext = createContext();
 
 const EmployeeContextProvider = ({ children }) => {
-  
   const createUserProfile = async (data) => {
     try {
       const user = auth.currentUser;
@@ -14,11 +13,11 @@ const EmployeeContextProvider = ({ children }) => {
         toast.error("No logged in user found. Please login again.");
         return;
       }
-  
+
       await setDoc(doc(db, "profiles", data.email || user.email), {
         uid: user.uid,
         ...data,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
       toast.success("Data added successfully");
       return { uid: user.uid, ...data };
@@ -52,11 +51,13 @@ const EmployeeContextProvider = ({ children }) => {
   };
 
   return (
-    <EmployeeContext.Provider value={{
-      createUserProfile,
-      getEmployeeProfile,
-      updateEmployeeDetails 
-    }}>
+    <EmployeeContext.Provider
+      value={{
+        createUserProfile,
+        getEmployeeProfile,
+        updateEmployeeDetails,
+      }}
+    >
       {children}
     </EmployeeContext.Provider>
   );

@@ -1,0 +1,157 @@
+import { a as e, n as t, t as n } from "./jsx-runtime-CjtlecKO.js";
+import { Q as r, w as i } from "./index-D6kauhrE.js";
+import { t as a } from "./esm-D4W-GGgw.js";
+import o from "./ViewCategory-Dbbjg8tW.js";
+var s = e(t()),
+  c = n(),
+  l = () => {
+    let { addSectionData: e } = r();
+    JSON.parse(sessionStorage.getItem(`data`));
+    let [t, n] = (0, s.useState)([]),
+      [i, o] = (0, s.useState)([]),
+      [l, u] = (0, s.useState)({
+        title: ``,
+        basicTitle: ``,
+        subCategory: [],
+        shortDescription: ``,
+        tags: [],
+        profilePicture: `abc`,
+      }),
+      d = (e) => {
+        u({ ...l, [e.target.name]: e.target.value });
+      };
+    return (0, c.jsx)(c.Fragment, {
+      children: (0, c.jsx)(`div`, {
+        className: `container-fluid`,
+        children: (0, c.jsx)(`div`, {
+          className: `container-sm`,
+          children: (0, c.jsxs)(`div`, {
+            className: `row`,
+            children: [
+              (0, c.jsx)(`div`, {
+                className: `col-lg`,
+                children: (0, c.jsx)(`h3`, {
+                  className: `h3 text-prime`,
+                  children: `Add Category`,
+                }),
+              }),
+              (0, c.jsxs)(`form`, {
+                onSubmit: async (n) => {
+                  n.preventDefault();
+                  try {
+                    let n = { ...l, subCategory: i, tags: t },
+                      r = await e(n);
+                    console.log(r);
+                  } catch (e) {
+                    console.error(e);
+                  }
+                },
+                children: [
+                  (0, c.jsxs)(`div`, {
+                    className: `form-group mb-3`,
+                    children: [
+                      (0, c.jsx)(`label`, {
+                        htmlFor: `title`,
+                        className: `h6`,
+                        children: `Title`,
+                      }),
+                      (0, c.jsx)(`input`, {
+                        type: `text`,
+                        className: `form-control`,
+                        name: `title`,
+                        placeholder: `Category title`,
+                        value: l.title,
+                        onChange: d,
+                      }),
+                    ],
+                  }),
+                  (0, c.jsxs)(`div`, {
+                    className: `form-group mb-3`,
+                    children: [
+                      (0, c.jsx)(`label`, {
+                        htmlFor: `basicTitle`,
+                        className: `h6`,
+                        children: `Basic Title`,
+                      }),
+                      (0, c.jsx)(`input`, {
+                        type: `text`,
+                        className: `form-control`,
+                        name: `basicTitle`,
+                        placeholder: `Basic title`,
+                        value: l.basicTitle,
+                        onChange: d,
+                      }),
+                    ],
+                  }),
+                  (0, c.jsxs)(`div`, {
+                    className: `form-group mb-3`,
+                    children: [
+                      (0, c.jsx)(`label`, {
+                        htmlFor: `shortDescription`,
+                        className: `h6`,
+                        children: `Short Description`,
+                      }),
+                      (0, c.jsx)(`textarea`, {
+                        className: `form-control`,
+                        name: `shortDescription`,
+                        placeholder: `Short description`,
+                        value: l.shortDescription,
+                        onChange: d,
+                        rows: 3,
+                      }),
+                    ],
+                  }),
+                  (0, c.jsxs)(`div`, {
+                    className: `form-group mb-3`,
+                    children: [
+                      (0, c.jsx)(`label`, {
+                        htmlFor: `subCategory`,
+                        className: `h6`,
+                        children: `Subcategories`,
+                      }),
+                      (0, c.jsx)(a, {
+                        value: i,
+                        onChange: (e) => {
+                          (o(e), u({ ...l, subCategory: e }));
+                        },
+                        name: `subCategory`,
+                        placeHolder: `Add subcategories`,
+                      }),
+                    ],
+                  }),
+                  (0, c.jsxs)(`div`, {
+                    className: `form-group mb-3`,
+                    children: [
+                      (0, c.jsx)(`label`, {
+                        htmlFor: `tags`,
+                        className: `h6`,
+                        children: `Tags`,
+                      }),
+                      (0, c.jsx)(a, {
+                        value: t,
+                        onChange: (e) => {
+                          (n(e), u({ ...l, tags: e }));
+                        },
+                        name: `tags`,
+                        placeHolder: `Add tags`,
+                      }),
+                    ],
+                  }),
+                  (0, c.jsx)(`button`, {
+                    className: `btn bg-prime text-light`,
+                    children: `Add Category`,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        }),
+      }),
+    });
+  },
+  u = () =>
+    (0, c.jsx)(i, {
+      tabs: [`Add Category`, `Active Category`],
+      children: [(0, c.jsx)(l, {}), (0, c.jsx)(o, {})],
+    });
+export { u as default };

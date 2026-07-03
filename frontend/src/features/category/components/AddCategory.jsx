@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TagsInput } from 'react-tag-input-component';
+import { TagsInput } from "react-tag-input-component";
 import { useSectionContext } from "../../../context";
 
 const AddCategory = () => {
@@ -8,12 +8,12 @@ const AddCategory = () => {
   const [tags, setTags] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [sectionData, setSectionData] = useState({
-    title: '',
-    basicTitle: '',
+    title: "",
+    basicTitle: "",
     subCategory: [],
-    shortDescription: '',
+    shortDescription: "",
     tags: [],
-    profilePicture: 'abc'
+    profilePicture: "abc",
   });
 
   const handleInputChange = (e) => {
@@ -23,14 +23,18 @@ const AddCategory = () => {
     });
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedSectionData = { ...sectionData, subCategory: subCategories, tags };
+      const updatedSectionData = {
+        ...sectionData,
+        subCategory: subCategories,
+        tags,
+      };
       const result = await addSectionData(updatedSectionData);
       console.log(result);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
 
@@ -44,7 +48,9 @@ const AddCategory = () => {
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-group mb-3">
-                <label htmlFor="title" className="h6">Title</label>
+                <label htmlFor="title" className="h6">
+                  Title
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -55,7 +61,9 @@ const AddCategory = () => {
                 />
               </div>
               <div className="form-group mb-3">
-                <label htmlFor="basicTitle" className="h6">Basic Title</label>
+                <label htmlFor="basicTitle" className="h6">
+                  Basic Title
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -66,7 +74,9 @@ const AddCategory = () => {
                 />
               </div>
               <div className="form-group mb-3">
-                <label htmlFor="shortDescription" className="h6">Short Description</label>
+                <label htmlFor="shortDescription" className="h6">
+                  Short Description
+                </label>
                 <textarea
                   className="form-control"
                   name="shortDescription"
@@ -77,19 +87,26 @@ const AddCategory = () => {
                 />
               </div>
               <div className="form-group mb-3">
-                <label htmlFor="subCategory" className="h6">Subcategories</label>
+                <label htmlFor="subCategory" className="h6">
+                  Subcategories
+                </label>
                 <TagsInput
                   value={subCategories}
                   onChange={(subCategories) => {
                     setSubCategories(subCategories);
-                    setSectionData({ ...sectionData, subCategory: subCategories });
+                    setSectionData({
+                      ...sectionData,
+                      subCategory: subCategories,
+                    });
                   }}
                   name="subCategory"
                   placeHolder="Add subcategories"
                 />
               </div>
               <div className="form-group mb-3">
-                <label htmlFor="tags" className="h6">Tags</label>
+                <label htmlFor="tags" className="h6">
+                  Tags
+                </label>
                 <TagsInput
                   value={tags}
                   onChange={(tags) => {

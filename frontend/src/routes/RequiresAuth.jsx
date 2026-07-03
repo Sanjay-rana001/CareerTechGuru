@@ -1,15 +1,15 @@
-import React from 'react'
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuthContext } from '../context';
+import React from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuthContext } from "../context";
 
 const RequiresAuth = () => {
-    const location = useLocation();
-    const {token} = useAuthContext();
+  const location = useLocation();
+  const { token } = useAuthContext();
   return token ? (
     <Outlet />
   ) : (
-    <Navigate to="/login" state={{from : location}} />
+    <Navigate to="/login" state={{ from: location }} />
   );
-}
+};
 
-export default RequiresAuth
+export default RequiresAuth;

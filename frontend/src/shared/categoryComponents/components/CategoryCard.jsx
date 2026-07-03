@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const CategoryCard = () => {
-  return (
-    <div>CategoryCard</div>
-  )
-}
+  return <div>CategoryCard</div>;
+};
 
-export default CategoryCard
+export default CategoryCard;

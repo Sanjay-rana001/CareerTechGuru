@@ -1,11 +1,17 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { SelectInput, TextInput } from '../../../components';
-import { GetCountries } from 'react-country-state-city';
-import { useAuthContext } from '../../../context';
-import { storage } from '../../../firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import React, { useEffect, useState, useRef } from "react";
+import { SelectInput, TextInput } from "../../../components";
+import { GetCountries } from "react-country-state-city";
+import { useAuthContext } from "../../../context";
+import { storage } from "../../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSubmit }) => {
+const FormStepTwo = ({
+  nextStep,
+  prevStep,
+  handleInputChange,
+  formData,
+  handleSubmit,
+}) => {
   const { loading } = useAuthContext();
   const [formErrors, setFormErrors] = useState({
     firstName: "",
@@ -13,8 +19,8 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
     mobile: "",
   });
   const [countriesList, setCountriesList] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [file, setFile] = useState(null);
   const fileInput = useRef(null);
 
@@ -22,7 +28,10 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
     const fetchCountries = async () => {
       try {
         const countries = await GetCountries();
-        const countryOptions = countries.map(country => ({ value: country.isoCode, label: country.name }));
+        const countryOptions = countries.map((country) => ({
+          value: country.isoCode,
+          label: country.name,
+        }));
         setCountriesList(countryOptions);
       } catch (error) {
         console.error("Failed to fetch countries:", error);
@@ -66,33 +75,33 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
- 
+
   const handleResumeUpload = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
-    setSuccessMessage('');
- 
+    setErrorMessage("");
+    setSuccessMessage("");
+
     if (!file) {
-      setErrorMessage('Please select a file to upload.');
+      setErrorMessage("Please select a file to upload.");
       return;
     }
- 
+
     try {
       if (!formData.email) {
-        setErrorMessage('Please enter your email in Step 1 first.');
+        setErrorMessage("Please enter your email in Step 1 first.");
         return;
       }
-      
+
       const storageRef = ref(storage, `resumes/${formData.email}/${file.name}`);
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       // Save the resume URL in the form data state so it gets saved on submit
-      handleInputChange('resumeUrl')({ target: { value: downloadURL } });
-      setSuccessMessage('File uploaded successfully.');
+      handleInputChange("resumeUrl")({ target: { value: downloadURL } });
+      setSuccessMessage("File uploaded successfully.");
     } catch (error) {
-      console.error('Error uploading file to Firebase Storage:', error);
-      setErrorMessage('Error in setting up the request: ' + error.message);
+      console.error("Error uploading file to Firebase Storage:", error);
+      setErrorMessage("Error in setting up the request: " + error.message);
     }
   };
 
@@ -100,7 +109,10 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
     <form className="space-y-5">
       {/* Country selection */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="country" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        <label
+          htmlFor="country"
+          className="text-xs font-semibold text-slate-500 uppercase tracking-wider"
+        >
           Country
         </label>
         <SelectInput
@@ -108,12 +120,19 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
           value={formData.country}
           onChange={handleInputChange("country")}
         />
-        {formErrors.country && <p className="text-red-500 text-xs font-medium mb-0">{formErrors.country}</p>}
+        {formErrors.country && (
+          <p className="text-red-500 text-xs font-medium mb-0">
+            {formErrors.country}
+          </p>
+        )}
       </div>
 
       {/* First Name field */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="firstName" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        <label
+          htmlFor="firstName"
+          className="text-xs font-semibold text-slate-500 uppercase tracking-wider"
+        >
           First Name <sup className="text-red-500">*</sup>
         </label>
         <TextInput
@@ -123,12 +142,19 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
           value={formData.firstName}
           onChange={handleInputChange("firstName")}
         />
-        {formErrors.firstName && <p className="text-red-500 text-xs font-medium mb-0">{formErrors.firstName}</p>}
+        {formErrors.firstName && (
+          <p className="text-red-500 text-xs font-medium mb-0">
+            {formErrors.firstName}
+          </p>
+        )}
       </div>
 
       {/* Last Name field */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="lastName" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        <label
+          htmlFor="lastName"
+          className="text-xs font-semibold text-slate-500 uppercase tracking-wider"
+        >
           Last Name <sup className="text-red-500">*</sup>
         </label>
         <TextInput
@@ -138,12 +164,19 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
           value={formData.lastName}
           onChange={handleInputChange("lastName")}
         />
-        {formErrors.lastName && <p className="text-red-500 text-xs font-medium mb-0">{formErrors.lastName}</p>}
+        {formErrors.lastName && (
+          <p className="text-red-500 text-xs font-medium mb-0">
+            {formErrors.lastName}
+          </p>
+        )}
       </div>
 
       {/* Mobile field */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="mobile" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        <label
+          htmlFor="mobile"
+          className="text-xs font-semibold text-slate-500 uppercase tracking-wider"
+        >
           Mobile Number <sup className="text-red-500">*</sup>
         </label>
         <TextInput
@@ -153,46 +186,60 @@ const FormStepTwo = ({ nextStep, prevStep, handleInputChange, formData, handleSu
           value={formData.mobile}
           onChange={handleInputChange("mobile")}
         />
-        {formErrors.mobile && <p className="text-red-500 text-xs font-medium mb-0">{formErrors.mobile}</p>}
+        {formErrors.mobile && (
+          <p className="text-red-500 text-xs font-medium mb-0">
+            {formErrors.mobile}
+          </p>
+        )}
       </div>
 
       {/* Resume Upload Box */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-        <span className="text-xs font-bold text-slate-700 block">Upload Resume</span>
+        <span className="text-xs font-bold text-slate-700 block">
+          Upload Resume
+        </span>
         <input
           type="file"
           name="file"
           className="w-full bg-white border border-slate-300 rounded-lg text-xs p-2 focus:outline-none"
           ref={fileInput}
-          onChange={handleFileChange} 
+          onChange={handleFileChange}
         />
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <span className="text-xs font-semibold text-slate-400">
             Supported formats: .doc, .docx, .pdf
           </span>
-          <button 
+          <button
             type="button"
-            onClick={handleResumeUpload} 
+            onClick={handleResumeUpload}
             className="px-4 py-1.5 bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-bold rounded-lg border-0 transition-colors cursor-pointer"
           >
             Upload
           </button>
         </div>
-        
-        {errorMessage && <p className="text-xs font-medium text-red-500 mb-0">{errorMessage}</p>}
-        {successMessage && <p className="text-xs font-medium text-emerald-500 mb-0">{successMessage}</p>}
+
+        {errorMessage && (
+          <p className="text-xs font-medium text-red-500 mb-0">
+            {errorMessage}
+          </p>
+        )}
+        {successMessage && (
+          <p className="text-xs font-medium text-emerald-500 mb-0">
+            {successMessage}
+          </p>
+        )}
       </div>
 
       {/* Action buttons */}
       <div className="flex gap-3 pt-4 border-t border-slate-100">
-        <button 
-          type="button" 
-          onClick={prevStep} 
+        <button
+          type="button"
+          onClick={prevStep}
           className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg border-0 transition-colors text-sm"
         >
           Back
         </button>
-        <button 
+        <button
           onClick={handleFormSubmit}
           className="flex-1 bg-[#2563EB] hover:bg-blue-700 text-white font-semibold py-3 rounded-lg border-0 shadow-sm transition-colors text-sm"
           disabled={loading}

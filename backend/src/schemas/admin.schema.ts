@@ -1,6 +1,6 @@
-import Joi, { ObjectSchema } from 'joi';
+import Joi, { ObjectSchema } from "joi";
 
-export const adminSchema : ObjectSchema = Joi.object().keys(({
+export const adminSchema: ObjectSchema = Joi.object().keys({
   _id: Joi.string(),
   email: Joi.string().email().required(),
   companyName: Joi.string().required(),
@@ -24,4 +24,4 @@ export const adminSchema : ObjectSchema = Joi.object().keys(({
   otp: Joi.string(),
   otpExpiration: Joi.date(),
   updatedAt: Joi.date(),
-}));
+});

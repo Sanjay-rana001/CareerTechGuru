@@ -1,0 +1,350 @@
+import { a as e, n as t, t as n } from "./jsx-runtime-CjtlecKO.js";
+import { $ as r, X as i, q as a } from "./index-D6kauhrE.js";
+var o = e(t()),
+  s = n(),
+  c = () => {
+    let { getGlobalUsers: e } = a(),
+      { getAllApplications: t, deleteJobById: n } = i(),
+      [c, l] = (0, o.useState)(`overview`),
+      [u, d] = (0, o.useState)([]),
+      [f, p] = (0, o.useState)([]),
+      [m, h] = (0, o.useState)(!0),
+      [g, _] = (0, o.useState)(null),
+      [v, y] = (0, o.useState)(null),
+      [b, x] = (0, o.useState)(!1),
+      [S, C] = (0, o.useState)(!1);
+    (0, o.useEffect)(() => {
+      w();
+    }, []);
+    let w = async () => {
+        h(!0);
+        try {
+          let [n, r] = await Promise.all([e(null, 20), t(null, 20)]);
+          (d(n?.data || []),
+            _(n?.lastDoc || null),
+            p(r?.data || []),
+            y(r?.lastDoc || null));
+        } catch (e) {
+          (console.error(e), r.error(`Error fetching CMS data`));
+        } finally {
+          h(!1);
+        }
+      },
+      T = async () => {
+        if (g) {
+          x(!0);
+          try {
+            let t = await e(g, 20);
+            t?.data?.length > 0
+              ? (d((e) => [...e, ...t.data]), _(t.lastDoc))
+              : _(null);
+          } catch (e) {
+            (console.error(e), r.error(`Error fetching more users`));
+          } finally {
+            x(!1);
+          }
+        }
+      },
+      E = async () => {
+        if (v) {
+          C(!0);
+          try {
+            let e = await t(v, 20);
+            e?.data?.length > 0
+              ? (p((t) => [...t, ...e.data]), y(e.lastDoc))
+              : y(null);
+          } catch (e) {
+            (console.error(e), r.error(`Error fetching more jobs`));
+          } finally {
+            C(!1);
+          }
+        }
+      },
+      D = async (e) => {
+        window.confirm(
+          `Are you sure you want to delete this job? This cannot be undone.`,
+        ) &&
+          (await n(e))?.status === 200 &&
+          p((t) => t.filter((t) => t.id !== e));
+      };
+    return m
+      ? (0, s.jsx)(`div`, {
+          className: `text-center p-10`,
+          children: (0, s.jsx)(`span`, {
+            className: `text-xl`,
+            children: `Loading Platform Data...`,
+          }),
+        })
+      : (0, s.jsxs)(`div`, {
+          className: `container mx-auto p-4 md:p-8 bg-gray-50 min-h-screen`,
+          children: [
+            (0, s.jsxs)(`div`, {
+              className: `flex justify-between items-center mb-8`,
+              children: [
+                (0, s.jsxs)(`div`, {
+                  children: [
+                    (0, s.jsx)(`h1`, {
+                      className: `text-3xl font-bold text-gray-800`,
+                      children: `Platform Admin CMS`,
+                    }),
+                    (0, s.jsx)(`p`, {
+                      className: `text-gray-500`,
+                      children: `Manage jobs, users, and platform settings.`,
+                    }),
+                  ],
+                }),
+                (0, s.jsx)(`button`, {
+                  onClick: w,
+                  className: `btn btn-primary`,
+                  children: `Refresh Data`,
+                }),
+              ],
+            }),
+            (0, s.jsxs)(`div`, {
+              className: `flex space-x-4 border-b border-gray-200 mb-6`,
+              children: [
+                (0, s.jsx)(`button`, {
+                  className: `pb-2 px-4 ${c === `overview` ? `border-b-2 border-blue-600 text-blue-600 font-bold` : `text-gray-500`}`,
+                  onClick: () => l(`overview`),
+                  children: `Overview`,
+                }),
+                (0, s.jsx)(`button`, {
+                  className: `pb-2 px-4 ${c === `jobs` ? `border-b-2 border-blue-600 text-blue-600 font-bold` : `text-gray-500`}`,
+                  onClick: () => l(`jobs`),
+                  children: `Manage Jobs`,
+                }),
+                (0, s.jsx)(`button`, {
+                  className: `pb-2 px-4 ${c === `users` ? `border-b-2 border-blue-600 text-blue-600 font-bold` : `text-gray-500`}`,
+                  onClick: () => l(`users`),
+                  children: `Manage Users`,
+                }),
+              ],
+            }),
+            c === `overview` &&
+              (0, s.jsxs)(`div`, {
+                className: `grid grid-cols-1 md:grid-cols-3 gap-6`,
+                children: [
+                  (0, s.jsxs)(`div`, {
+                    className: `bg-white p-6 rounded-lg shadow border-t-4 border-blue-500`,
+                    children: [
+                      (0, s.jsx)(`h3`, {
+                        className: `text-gray-500 text-sm font-semibold`,
+                        children: `Total Registered Users`,
+                      }),
+                      (0, s.jsxs)(`p`, {
+                        className: `text-4xl font-bold mt-2`,
+                        children: [u.length, g && `+`],
+                      }),
+                    ],
+                  }),
+                  (0, s.jsxs)(`div`, {
+                    className: `bg-white p-6 rounded-lg shadow border-t-4 border-green-500`,
+                    children: [
+                      (0, s.jsx)(`h3`, {
+                        className: `text-gray-500 text-sm font-semibold`,
+                        children: `Total Active Jobs`,
+                      }),
+                      (0, s.jsxs)(`p`, {
+                        className: `text-4xl font-bold mt-2`,
+                        children: [f.length, v && `+`],
+                      }),
+                    ],
+                  }),
+                  (0, s.jsxs)(`div`, {
+                    className: `bg-white p-6 rounded-lg shadow border-t-4 border-purple-500`,
+                    children: [
+                      (0, s.jsx)(`h3`, {
+                        className: `text-gray-500 text-sm font-semibold`,
+                        children: `Platform Health`,
+                      }),
+                      (0, s.jsx)(`p`, {
+                        className: `text-xl font-bold mt-2 text-green-600`,
+                        children: `Optimal`,
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            c === `jobs` &&
+              (0, s.jsxs)(`div`, {
+                className: `bg-white rounded-lg shadow overflow-hidden`,
+                children: [
+                  (0, s.jsxs)(`table`, {
+                    className: `min-w-full divide-y divide-gray-200`,
+                    children: [
+                      (0, s.jsx)(`thead`, {
+                        className: `bg-gray-50`,
+                        children: (0, s.jsxs)(`tr`, {
+                          children: [
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `Job Title`,
+                            }),
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `Company`,
+                            }),
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `Posted By`,
+                            }),
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `Actions`,
+                            }),
+                          ],
+                        }),
+                      }),
+                      (0, s.jsxs)(`tbody`, {
+                        className: `bg-white divide-y divide-gray-200`,
+                        children: [
+                          f.map((e) =>
+                            (0, s.jsxs)(
+                              `tr`,
+                              {
+                                children: [
+                                  (0, s.jsx)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap font-medium text-gray-900`,
+                                    children: e.title || e.jobTitle,
+                                  }),
+                                  (0, s.jsx)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap text-gray-500`,
+                                    children: e.company,
+                                  }),
+                                  (0, s.jsx)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap text-gray-500`,
+                                    children: e.postedBy,
+                                  }),
+                                  (0, s.jsx)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap text-right text-sm font-medium`,
+                                    children: (0, s.jsx)(`button`, {
+                                      onClick: () => D(e.id),
+                                      className: `text-red-600 hover:text-red-900`,
+                                      children: `Delete`,
+                                    }),
+                                  }),
+                                ],
+                              },
+                              e.id,
+                            ),
+                          ),
+                          f.length === 0 &&
+                            (0, s.jsx)(`tr`, {
+                              children: (0, s.jsx)(`td`, {
+                                colSpan: `4`,
+                                className: `text-center p-4`,
+                                children: `No jobs found.`,
+                              }),
+                            }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  v &&
+                    (0, s.jsx)(`div`, {
+                      className: `p-4 flex justify-center border-t border-gray-200 bg-gray-50`,
+                      children: (0, s.jsx)(`button`, {
+                        onClick: E,
+                        disabled: S,
+                        className: `px-6 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors`,
+                        children: S ? `Loading...` : `Load More Jobs`,
+                      }),
+                    }),
+                ],
+              }),
+            c === `users` &&
+              (0, s.jsxs)(`div`, {
+                className: `bg-white rounded-lg shadow overflow-hidden`,
+                children: [
+                  (0, s.jsxs)(`table`, {
+                    className: `min-w-full divide-y divide-gray-200`,
+                    children: [
+                      (0, s.jsx)(`thead`, {
+                        className: `bg-gray-50`,
+                        children: (0, s.jsxs)(`tr`, {
+                          children: [
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `User`,
+                            }),
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `Email`,
+                            }),
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `Role`,
+                            }),
+                            (0, s.jsx)(`th`, {
+                              className: `px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`,
+                              children: `Status`,
+                            }),
+                          ],
+                        }),
+                      }),
+                      (0, s.jsxs)(`tbody`, {
+                        className: `bg-white divide-y divide-gray-200`,
+                        children: [
+                          u.map((e) =>
+                            (0, s.jsxs)(
+                              `tr`,
+                              {
+                                children: [
+                                  (0, s.jsxs)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap font-medium text-gray-900`,
+                                    children: [e.firstName, ` `, e.lastName],
+                                  }),
+                                  (0, s.jsx)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap text-gray-500`,
+                                    children: e.email,
+                                  }),
+                                  (0, s.jsx)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap`,
+                                    children: (0, s.jsx)(`span`, {
+                                      className: `px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${e.role === `superadmin` ? `bg-purple-100 text-purple-800` : e.role === `admin` ? `bg-blue-100 text-blue-800` : `bg-green-100 text-green-800`}`,
+                                      children:
+                                        e.role === `admin`
+                                          ? `employer`
+                                          : e.role,
+                                    }),
+                                  }),
+                                  (0, s.jsx)(`td`, {
+                                    className: `px-6 py-4 whitespace-nowrap text-right text-sm font-medium`,
+                                    children: (0, s.jsx)(`span`, {
+                                      className: `text-green-600`,
+                                      children: `Active`,
+                                    }),
+                                  }),
+                                ],
+                              },
+                              e.id,
+                            ),
+                          ),
+                          u.length === 0 &&
+                            (0, s.jsx)(`tr`, {
+                              children: (0, s.jsx)(`td`, {
+                                colSpan: `4`,
+                                className: `text-center p-4`,
+                                children: `No users found.`,
+                              }),
+                            }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  g &&
+                    (0, s.jsx)(`div`, {
+                      className: `p-4 flex justify-center border-t border-gray-200 bg-gray-50`,
+                      children: (0, s.jsx)(`button`, {
+                        onClick: T,
+                        disabled: b,
+                        className: `px-6 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg transition-colors`,
+                        children: b ? `Loading...` : `Load More Users`,
+                      }),
+                    }),
+                ],
+              }),
+          ],
+        });
+  };
+export { c as default };

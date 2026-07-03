@@ -1,6 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaLinkedin, FaGithub, FaTwitter, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  FaLinkedin,
+  FaGithub,
+  FaTwitter,
+  FaEnvelope,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -13,16 +19,29 @@ const Footer = () => {
               Career<span className="text-[#2563EB]">TechGuru</span>
             </h4>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Matching awesome talent with awesome jobs around the world. Prove your skills and unlock opportunities.
+              Matching awesome talent with awesome jobs around the world. Prove
+              your skills and unlock opportunities.
             </p>
             <div className="flex gap-4 pt-2">
-              <a href="#" className="text-slate-400 hover:text-white transition-colors" aria-label="LinkedIn">
+              <a
+                href="#"
+                className="text-slate-400 hover:text-white transition-colors"
+                aria-label="LinkedIn"
+              >
                 <FaLinkedin size={20} />
               </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors" aria-label="GitHub">
+              <a
+                href="#"
+                className="text-slate-400 hover:text-white transition-colors"
+                aria-label="GitHub"
+              >
                 <FaGithub size={20} />
               </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors" aria-label="Twitter">
+              <a
+                href="#"
+                className="text-slate-400 hover:text-white transition-colors"
+                aria-label="Twitter"
+              >
                 <FaTwitter size={20} />
               </a>
             </div>
@@ -30,20 +49,31 @@ const Footer = () => {
 
           {/* Job Seekers Column */}
           <div>
-            <h5 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Job Seekers</h5>
+            <h5 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+              Job Seekers
+            </h5>
             <ul className="space-y-2.5 list-none p-0 text-sm">
               <li>
-                <Link to="/view-jobs" className="text-slate-400 hover:text-white transition-colors no-underline">
+                <Link
+                  to="/view-jobs"
+                  className="text-slate-400 hover:text-white transition-colors no-underline"
+                >
                   Browse Jobs
                 </Link>
               </li>
               <li>
-                <Link to="/view-profile" className="text-slate-400 hover:text-white transition-colors no-underline">
+                <Link
+                  to="/view-profile"
+                  className="text-slate-400 hover:text-white transition-colors no-underline"
+                >
                   My Profile
                 </Link>
               </li>
               <li>
-                <Link to="/view-applications" className="text-slate-400 hover:text-white transition-colors no-underline">
+                <Link
+                  to="/view-applications"
+                  className="text-slate-400 hover:text-white transition-colors no-underline"
+                >
                   Applied Jobs
                 </Link>
               </li>
@@ -52,15 +82,23 @@ const Footer = () => {
 
           {/* Employers Column */}
           <div>
-            <h5 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Employers</h5>
+            <h5 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+              Employers
+            </h5>
             <ul className="space-y-2.5 list-none p-0 text-sm">
               <li>
-                <Link to="/add-job" className="text-slate-400 hover:text-white transition-colors no-underline">
+                <Link
+                  to="/add-job"
+                  className="text-slate-400 hover:text-white transition-colors no-underline"
+                >
                   Post a Job
                 </Link>
               </li>
               <li>
-                <Link to="/register" className="text-slate-400 hover:text-white transition-colors no-underline">
+                <Link
+                  to="/register"
+                  className="text-slate-400 hover:text-white transition-colors no-underline"
+                >
                   Create Employer Account
                 </Link>
               </li>
@@ -69,15 +107,23 @@ const Footer = () => {
 
           {/* Company & Support Column */}
           <div>
-            <h5 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Company</h5>
+            <h5 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+              Company
+            </h5>
             <ul className="space-y-2.5 list-none p-0 text-sm">
               <li>
-                <Link to="/about-us" className="text-slate-400 hover:text-white transition-colors no-underline">
+                <Link
+                  to="/about-us"
+                  className="text-slate-400 hover:text-white transition-colors no-underline"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact-us" className="text-slate-400 hover:text-white transition-colors no-underline">
+                <Link
+                  to="/contact-us"
+                  className="text-slate-400 hover:text-white transition-colors no-underline"
+                >
                   Contact Us
                 </Link>
               </li>
@@ -92,11 +138,22 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-500 mb-0">
-            &copy; {new Date().getFullYear()} CareerTechGuru. All rights reserved. Powered by ESPS Pvt Ltd.
+            &copy; {new Date().getFullYear()} CareerTechGuru. All rights
+            reserved. Powered by ESPS Pvt Ltd.
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
-            <a href="#" className="hover:text-slate-400 transition-colors no-underline">Privacy Policy</a>
-            <a href="#" className="hover:text-slate-400 transition-colors no-underline">Terms of Service</a>
+            <a
+              href="#"
+              className="hover:text-slate-400 transition-colors no-underline"
+            >
+              Privacy Policy
+            </a>
+            <a
+              href="#"
+              className="hover:text-slate-400 transition-colors no-underline"
+            >
+              Terms of Service
+            </a>
           </div>
         </div>
       </div>

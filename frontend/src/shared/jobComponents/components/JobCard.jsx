@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import { IoLocationSharp, IoShareSocialSharp } from "react-icons/io5";
 import { FaSuitcase } from "react-icons/fa";
 import { truncateText } from "../../../utils/stringBuilder/Stringify";
@@ -17,24 +17,32 @@ const JobCard = ({ data }) => {
             <div className="flex gap-4 items-start flex-1">
               <div className="w-14 h-14 bg-slate-50 rounded-xl border border-slate-100 p-1 flex items-center justify-center overflow-hidden flex-shrink-0">
                 {job?.profilePicture ? (
-                  <img src={job.profilePicture} alt="Company Logo" className="max-h-full max-w-full object-contain" />
+                  <img
+                    src={job.profilePicture}
+                    alt="Company Logo"
+                    className="max-h-full max-w-full object-contain"
+                  />
                 ) : (
-                  <span className="text-xs text-slate-300 font-bold uppercase">CTG</span>
+                  <span className="text-xs text-slate-300 font-bold uppercase">
+                    CTG
+                  </span>
                 )}
               </div>
-              
+
               <div className="space-y-1.5">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                  <Link 
-                    className="no-underline text-slate-800 hover:text-[#2563EB] font-bold text-lg leading-tight transition-colors" 
+                  <Link
+                    className="no-underline text-slate-800 hover:text-[#2563EB] font-bold text-lg leading-tight transition-colors"
                     to={`/view-jobs-detail/${job?.title}`}
                   >
-                    {truncateText(job?.title || '', 6)}
+                    {truncateText(job?.title || "", 6)}
                   </Link>
                 </div>
-                
+
                 {job?.companyName && (
-                  <p className="text-sm font-medium text-slate-500 mb-0">{job.companyName}</p>
+                  <p className="text-sm font-medium text-slate-500 mb-0">
+                    {job.companyName}
+                  </p>
                 )}
 
                 <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -55,13 +63,13 @@ const JobCard = ({ data }) => {
               <span className="text-xs font-medium text-slate-400 order-1 md:order-none">
                 {convertTimeIntoDDMMYY(job?.createdAt)}
               </span>
-              
+
               <div className="flex items-center gap-2.5 order-2 md:order-none">
                 <button className="flex justify-center items-center px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-sm rounded-lg border-0 transition-colors">
                   Share <IoShareSocialSharp className="ms-1" />
                 </button>
-                <button 
-                  onClick={() => navigate(`/view-jobs-detail/${job?.title}`)} 
+                <button
+                  onClick={() => navigate(`/view-jobs-detail/${job?.title}`)}
                   className="px-5 py-2 bg-[#2563EB] hover:bg-blue-700 text-white font-semibold text-sm rounded-lg border-0 shadow-sm transition-colors"
                 >
                   Apply

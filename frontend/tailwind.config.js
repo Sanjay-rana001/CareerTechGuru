@@ -4,11 +4,10 @@ module.exports = {
   theme: {
     extend: {},
   },
-  variants:{
-    extend:{
-      display:['group-focus']
-    }
+  variants: {
+    extend: {
+      display: ["group-focus"],
+    },
   },
   plugins: [],
-}
-
+};

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Multiselect from 'multiselect-react-dropdown';
-import { experienceLevel, locations } from '../../../testData/StaticData';
-import { useEmployeeContext, useSectionContext } from '../../../context';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Multiselect from "multiselect-react-dropdown";
+import { experienceLevel, locations } from "../../../testData/StaticData";
+import { useEmployeeContext, useSectionContext } from "../../../context";
 
 const EmployeeProfile = () => {
-  const users = JSON.parse(sessionStorage.getItem('data'));
+  const users = JSON.parse(sessionStorage.getItem("data"));
   const { addProfileDetails } = useEmployeeContext();
   const { sections } = useSectionContext();
   const navigate = useNavigate();
@@ -16,56 +16,58 @@ const EmployeeProfile = () => {
     isNotificationEnabled: false,
     isEmployed: false,
     isEmailEnabled: false, // Corrected property name
-    experience: '',
+    experience: "",
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setValues((prevState) => ({
       ...prevState,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form values:', values);
+    console.log("Form values:", values);
     addProfileDetails(values);
     setTimeout(() => {
       navigate("/");
-    }, 2000)
+    }, 2000);
   };
 
   const onCategorySelect = (selectedList) => {
     setValues((prevState) => ({
       ...prevState,
-      category: selectedList.map(item => item.title), // Update the category array to strings
+      category: selectedList.map((item) => item.title), // Update the category array to strings
     }));
   };
 
   const onCategoryRemove = (selectedList) => {
     setValues((prevState) => ({
       ...prevState,
-      category: selectedList.map(item => item.title), // Update the category array to strings
+      category: selectedList.map((item) => item.title), // Update the category array to strings
     }));
   };
 
   const onLocationSelect = (selectedList) => {
     setValues((prevState) => ({
       ...prevState,
-      location: selectedList.map(item => item.title), // Update the location array to strings
+      location: selectedList.map((item) => item.title), // Update the location array to strings
     }));
   };
 
   const onLocationRemove = (selectedList) => {
     setValues((prevState) => ({
       ...prevState,
-      location: selectedList.map(item => item.title), // Update the location array to strings
+      location: selectedList.map((item) => item.title), // Update the location array to strings
     }));
   };
 
-  const categoryOptions = sections?.map((category) => ({ title: category?.title })) || [];
-  const locationOptions = locations?.map((location) => ({ title: location?.title })) || [];
+  const categoryOptions =
+    sections?.map((category) => ({ title: category?.title })) || [];
+  const locationOptions =
+    locations?.map((location) => ({ title: location?.title })) || [];
 
   return (
     <>
@@ -95,7 +97,9 @@ const EmployeeProfile = () => {
             </label>
             <Multiselect
               options={locationOptions}
-              selectedValues={locationOptions.filter(option => values.location.includes(option.title))} // Corrected selected values
+              selectedValues={locationOptions.filter((option) =>
+                values.location.includes(option.title),
+              )} // Corrected selected values
               onSelect={onLocationSelect}
               onRemove={onLocationRemove}
               displayValue="title"
@@ -107,7 +111,9 @@ const EmployeeProfile = () => {
             </label>
             <Multiselect
               options={categoryOptions}
-              selectedValues={categoryOptions?.filter(option => values.category.includes(option.title))} // Corrected selected values
+              selectedValues={categoryOptions?.filter((option) =>
+                values.category.includes(option.title),
+              )} // Corrected selected values
               onSelect={onCategorySelect}
               onRemove={onCategoryRemove}
               displayValue="title"

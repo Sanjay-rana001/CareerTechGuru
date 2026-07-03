@@ -1,7 +1,7 @@
 // PaginationComponent.js
 
-import React, { useState } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import React, { useState } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 function Pagination({ totalItems, itemsPerPage, onPageChange }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,12 +30,29 @@ function Pagination({ totalItems, itemsPerPage, onPageChange }) {
   };
 
   return (
-    <div className='flex items-center  justify-end me-3 gap-2 py-2'>
-      <p className='font-semibold flex items-center gap-3'>Page <span className='btn font-semibold outline rounded-none'>{`${currentPage}`}</span> <span>of</span> <span className='btn font-semibold rounded-none'>{`${totalPages}`}</span></p>
-      <button className='btn-main' onClick={onPrevPage} disabled={currentPage === 1}><FaChevronLeft /></button>
-      <button className='btn-main' onClick={onNextPage} disabled={currentPage === totalPages}><FaChevronRight /> </button>
+    <div className="flex items-center  justify-end me-3 gap-2 py-2">
+      <p className="font-semibold flex items-center gap-3">
+        Page{" "}
+        <span className="btn font-semibold outline rounded-none">{`${currentPage}`}</span>{" "}
+        <span>of</span>{" "}
+        <span className="btn font-semibold rounded-none">{`${totalPages}`}</span>
+      </p>
+      <button
+        className="btn-main"
+        onClick={onPrevPage}
+        disabled={currentPage === 1}
+      >
+        <FaChevronLeft />
+      </button>
+      <button
+        className="btn-main"
+        onClick={onNextPage}
+        disabled={currentPage === totalPages}
+      >
+        <FaChevronRight />{" "}
+      </button>
     </div>
   );
-};
+}
 
 export default Pagination;

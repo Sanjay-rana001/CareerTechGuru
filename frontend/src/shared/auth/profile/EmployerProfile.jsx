@@ -1,12 +1,12 @@
-import React from 'react'
-import { EmployerProfileForm } from '../../employerPages'
+import React from "react";
+import { EmployerProfileForm } from "../../employerPages";
 
 const EmployerProfile = () => {
   return (
     <>
       <EmployerProfileForm />
     </>
-  )
-}
+  );
+};
 
-export default EmployerProfile
+export default EmployerProfile;

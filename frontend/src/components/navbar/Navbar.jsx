@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logoImg from "../../assets/logo.jpeg";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import { FiLogOut, FiUser } from "react-icons/fi";
 import { useAuthContext } from "../../context";
 import { confirmAlert } from "react-confirm-alert";
 
@@ -34,12 +35,18 @@ const Navbar = () => {
     { id: 2, text: "My Profile", path: "/view-profile" },
   ];
 
+  const superAdminNavItems = [
+    { id: 1, text: "Admin Dashboard", path: "/admin-dashboard" },
+  ];
+
   const navItems =
     userRole === "user"
       ? employeeNavItems
       : userRole === "admin"
         ? employerNavItems
-        : defaultNavItems;
+        : userRole === "superadmin"
+          ? superAdminNavItems
+          : defaultNavItems;
 
   const Logout = () => {
     confirmAlert({
@@ -66,7 +73,7 @@ const Navbar = () => {
     <>
       <div className="w-full sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3 no-underline">
             <img
               src={logoImg}
               alt="Logo"
@@ -83,28 +90,35 @@ const Navbar = () => {
               <li key={item.id}>
                 <Link
                   to={item.path}
-                  className={`text-sm font-medium transition-colors duration-200 no-underline ${
+                  className={`text-sm font-semibold transition-colors duration-200 no-underline px-3 py-2 rounded-lg ${
                     isActive(item.path)
-                      ? "text-[#2563EB]"
-                      : "text-slate-600 hover:text-[#2563EB]"
+                      ? "text-[#2563EB] bg-blue-50"
+                      : "text-slate-600 hover:text-[#2563EB] hover:bg-slate-50"
                   }`}
                 >
                   {item.text}
                 </Link>
               </li>
             ))}
-            <li className="list-none">
+            <li className="list-none border-l border-slate-200 pl-8 ml-2">
               {userRole ? (
-                <button
-                  onClick={Logout}
-                  className="bg-red-50 hover:bg-red-100 text-red-600 font-medium text-sm px-5 py-2 rounded-lg transition-colors border-0"
-                >
-                  Logout
-                </button>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-slate-600 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+                    <FiUser className="text-[#2563EB]" />
+                    <span className="capitalize">{userRole === "admin" ? "Employer" : userRole === "user" ? "Candidate" : "Admin"}</span>
+                  </div>
+                  <button
+                    onClick={Logout}
+                    className="flex items-center gap-2 bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 font-medium text-sm px-4 py-2 rounded-lg transition-colors border border-slate-200 shadow-sm"
+                  >
+                    <FiLogOut />
+                    <span>Logout</span>
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => navigate("/login")}
-                  className="bg-[#2563EB] hover:bg-blue-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition-colors border-0 shadow-sm"
+                  className="bg-[#2563EB] hover:bg-blue-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors border-0 shadow-sm"
                 >
                   Login
                 </button>

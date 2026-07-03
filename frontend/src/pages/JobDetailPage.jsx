@@ -18,7 +18,7 @@ const JobDetailPage = () => {
   const [isApplying, setIsApplying] = useState(false);
 
   // React Query refactor: caching the applications list and the specific job details
-  const { data: allApplications, isLoading: isLoadingAll } = useQuery({
+  const { data: allApplications, isLoading: loading } = useQuery({
     queryKey: ["allApplications"],
     queryFn: async () => {
       const res = await getAllApplications();
@@ -26,18 +26,7 @@ const JobDetailPage = () => {
     },
   });
 
-  const job = allApplications?.find((app) => app.title === title);
-
-  const { data: jobData, isLoading: isLoadingJob } = useQuery({
-    queryKey: ["jobDetails", job?._id],
-    queryFn: async () => {
-      const res = await getApplicationsByJobId(job._id);
-      return res.data;
-    },
-    enabled: !!job?._id, // Only fetch if we found the job from the first query
-  });
-
-  const loading = isLoadingAll || (!!job && isLoadingJob);
+  const jobData = allApplications?.find((app) => app.title === title);
 
   const handleConfirm = () => {
     window.open(jobData?.jobUrl, "_blank", "noopener,noreferrer");

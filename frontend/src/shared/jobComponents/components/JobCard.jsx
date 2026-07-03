@@ -72,7 +72,7 @@ const JobCard = ({ data }) => {
                   onClick={() => navigate(`/view-jobs-detail/${job?.title}`)}
                   className="px-5 py-2 bg-[#2563EB] hover:bg-blue-700 text-white font-semibold text-sm rounded-lg border-0 shadow-sm transition-colors"
                 >
-                  Apply
+                  View Details
                 </button>
               </div>
             </div>

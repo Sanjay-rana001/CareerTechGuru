@@ -71,7 +71,7 @@ const JobDetailPage = () => {
   return (
     <div className="bg-slate-50 min-h-screen py-10">
       <Helmet>
-        <title>{jobData?.title} | CareerTechGuru</title>
+        <title>{`${jobData?.title || "Job Details"} | CareerTechGuru`}</title>
         <meta
           name="description"
           content={

@@ -95,68 +95,89 @@ const AppliedJobs = () => {
 
   if (applications?.length <= 0) {
     return (
-      <div className="flex items-center justify-center h-[100vh]">
-        <div className="col-md-6 flex flex-col items-center justify-center gap-3">
-          <h3 className="text-primary h1" style={{ marginBottom: "200px" }}>
-            No applications recieved
-          </h3>
-          {/* <button onClick={() => navigate("/")} className='btn btn-primary'>Go back</button> */}
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center font-sans">
+        <div className="text-center bg-white p-10 rounded-2xl shadow-sm border border-slate-200 max-w-md w-full">
+          <div className="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+          </div>
+          <h3 className="text-2xl font-bold text-slate-800 mb-2">No applications yet</h3>
+          <p className="text-slate-500 text-sm mb-8">When candidates apply to your job postings, they will appear here.</p>
+          <button onClick={() => navigate("/add-job")} className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors">
+            Post a new job
+          </button>
         </div>
       </div>
     );
   }
+
   return (
-    <>
-      <div className="container-fluid">
-        <div className="container py-3">
-          <div className="row">
-            <h3 className="text-2xl font-semibold text-[#070f4e]">
-              My Applications ({applications?.length})
-            </h3>
+    <div className="bg-slate-50 min-h-screen py-10 font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 border border-slate-200 rounded-2xl shadow-sm">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+              Received Applications
+            </h1>
+            <p className="text-sm text-slate-400 mb-0 mt-1">
+              You have received {applications?.length} {applications?.length === 1 ? 'application' : 'applications'} in total
+            </p>
           </div>
-          <div className="row w-100 x-flow-scroll">
-            <table className="table text-[14px] w-max">
-              <thead>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
                 <tr>
-                  <th>Job title</th>
-                  <th>Job category</th>
-                  <th>Candidate name</th>
-                  <th>Candidate email</th>
-                  <th>Candidate country</th>
-                  <th>Candidate mobile</th>
-                  <th>Job posted</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Job title</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Candidate name</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Country</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Mobile</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Applied date</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="capitalize">
+              <tbody className="divide-y divide-slate-100">
                 {applications?.map((application, index) => (
-                  <tr key={index}>
-                    <td>{application.title}</td>
-                    <td>
+                  <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-slate-800">
+                      {application.title}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">
                       {categories[index]
                         ? categories[index][0]?.title || "Unknown"
                         : "Unknown"}
                     </td>
-                    <td>
+                    <td className="px-6 py-4 text-slate-800 font-medium capitalize">
                       {application?.firstName} {application?.lastName}
                     </td>
-                    <td>{application?.userEmail || candidateData[index]?.email || "N/A"}</td>
-                    <td>{candidateData[index]?.country || "N/A"}</td>
-                    <td>{candidateData[index]?.mobile || "N/A"}</td>
-                    <td>{formatDate(application?.appliedAt || application?.createdAt)}</td>
-                    <td>
-                      <span className="bg-success text-light p-1 rounded text-[14px]">
+                    <td className="px-6 py-4 text-slate-500">
+                      {application?.userEmail || candidateData[index]?.email || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600 capitalize">
+                      {candidateData[index]?.country || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {candidateData[index]?.mobile || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-slate-500">
+                      {formatDate(application?.appliedAt || application?.createdAt)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${application?.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'} capitalize`}>
                         {application?.status}
                       </span>
                     </td>
-                    <td>
-                      <Link
+                    <td className="px-6 py-4 text-right">
+                      <button
                         onClick={() => handleProfileOpen(candidateData[index])}
-                        className="text-primary"
+                        className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
                       >
                         View profile
-                      </Link>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -173,7 +194,7 @@ const AppliedJobs = () => {
           />
         </ModalBox>
       )}
-    </>
+    </div>
   );
 };
 

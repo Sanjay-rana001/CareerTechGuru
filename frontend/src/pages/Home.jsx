@@ -192,12 +192,12 @@ const Home = () => {
               ].map((company, idx) => (
                 <div
                   key={idx}
-                  className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm w-36 h-20 flex items-center justify-center overflow-hidden"
+                  className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm w-36 h-20 flex items-center justify-center overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-blue-200 group cursor-pointer"
                 >
                   <img
                     src={`/companies/${company}.svg`}
                     alt={`${company} Logo`}
-                    className="max-h-full max-w-full object-contain"
+                    className="w-12 h-12 object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110"
                   />
                 </div>
               ))}

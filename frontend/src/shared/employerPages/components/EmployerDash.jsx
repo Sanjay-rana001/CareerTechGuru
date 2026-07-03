@@ -32,7 +32,12 @@ const EmployerDash = () => {
 
   const fetchData = async () => {
     try {
-      const jobsData = await getApplicationsByAdminId(admin?.id);
+      const adminId = admin?._id || admin?.id;
+      if (!adminId) {
+        setLoading(false);
+        return;
+      }
+      const jobsData = await getApplicationsByAdminId(adminId);
       if (jobsData && jobsData.length > 0) {
         setJobsData(jobsData);
       }

@@ -11,7 +11,7 @@ import CandidateProfile from "./candidate/CandidateProfile";
 const AppliedJobs = () => {
   const {
     getApplicationBySellerId,
-    getAdminsDetailsById,
+    getAdminsDetailsByAdminId,
     getCandidateDetails,
   } = useAdminContext();
   const { getJobSectionById } = useSectionContext();
@@ -60,7 +60,7 @@ const AppliedJobs = () => {
           );
 
           const adminDetailsPromises = sellerIds.map((sellerId) =>
-            getAdminsDetailsById(sellerId, "Employer"),
+            getAdminsDetailsByAdminId(sellerId, "Employer"),
           );
 
           const candidateDetailsPromises = userIds.map((userId) =>
@@ -85,7 +85,7 @@ const AppliedJobs = () => {
     };
 
     getUserApplications();
-  }, [getApplicationBySellerId, getAdminsDetailsById]);
+  }, [getApplicationBySellerId, getAdminsDetailsByAdminId]);
 
   useEffect(() => {
     if (applications?.length > 0) {
@@ -122,8 +122,8 @@ const AppliedJobs = () => {
                   <th>Job category</th>
                   <th>Candidate name</th>
                   <th>Candidate email</th>
-                  <th>Candidate city</th>
-                  <th>Candidate pincode</th>
+                  <th>Candidate country</th>
+                  <th>Candidate mobile</th>
                   <th>Job posted</th>
                   <th>Status</th>
                   <th>Action</th>
@@ -141,10 +141,10 @@ const AppliedJobs = () => {
                     <td>
                       {application?.firstName} {application?.lastName}
                     </td>
-                    <td>{application?.userEmail}</td>
-                    <td>{companyData[index]?.companyName || "Fetching..."}</td>
-                    <td>{companyData[index]?.city || "Fetching..."}</td>
-                    <td>{formatDate(application?.createdAt)}</td>
+                    <td>{application?.userEmail || candidateData[index]?.email || "N/A"}</td>
+                    <td>{candidateData[index]?.country || "N/A"}</td>
+                    <td>{candidateData[index]?.mobile || "N/A"}</td>
+                    <td>{formatDate(application?.appliedAt || application?.createdAt)}</td>
                     <td>
                       <span className="bg-success text-light p-1 rounded text-[14px]">
                         {application?.status}
@@ -169,7 +169,7 @@ const AppliedJobs = () => {
         <ModalBox>
           <CandidateProfile
             handleModalClose={handleModalClose}
-            candidateData={candidateData}
+            candidateData={selectedCandidate}
           />
         </ModalBox>
       )}

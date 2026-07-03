@@ -14,6 +14,9 @@ const AccountSettings = React.lazy(
   () => import("../shared/employerPages/components/AccountSettings"),
 );
 const ViewJob = React.lazy(() => import("../features/job/components/ViewJob"));
+const AppliedJobs = React.lazy(
+  () => import("../features/job/components/AppliedJobs"),
+);
 
 const EmployeeProfile = React.lazy(
   () => import("../shared/employee/components/EmployeeProfile"),
@@ -53,10 +56,10 @@ export const employerRoutes = [
     path: "/view-my-applications",
     element: <ViewJob />,
   },
-  // {
-  //     path : '/recieved-applications',
-  //     element : <AppliedJobs />
-  // },
+  {
+    path: "/recieved-applications",
+    element: <AppliedJobs />,
+  },
 ];
 
 export const employeeRoutes = [

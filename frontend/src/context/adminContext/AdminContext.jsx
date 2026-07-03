@@ -51,6 +51,17 @@ const AdminContextProvider = ({ children }) => {
     }
   };
 
+  // Function to get candidate details by user ID
+  const getCandidateDetails = async (userId) => {
+    try {
+      const docSnap = await getDoc(doc(db, "users", userId));
+      return { data: docSnap.data() };
+    } catch (error) {
+      console.error("Error fetching candidate details:", error);
+      return { data: null };
+    }
+  };
+
   // Function to create a job application
   const createJobApplication = async (data) => {
     try {
@@ -187,6 +198,7 @@ const AdminContextProvider = ({ children }) => {
         getAdminsDetailsByAdminId,
         addAdminProfleDetail,
         createJobApplication,
+        getCandidateDetails,
         getApplicationByUserId,
         getApplicationBySellerId,
         getGlobalUsers,

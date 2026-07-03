@@ -326,7 +326,7 @@ const Home = () => {
                     className="bg-white px-6 py-4 rounded-xl border border-slate-200 shadow-sm w-44 text-center"
                   >
                     <span className="font-medium text-slate-700 capitalize text-sm">
-                      {item?.label || item}
+                      {item?.label || (typeof item === 'string' ? item : '')}
                     </span>
                   </div>
                 ))}

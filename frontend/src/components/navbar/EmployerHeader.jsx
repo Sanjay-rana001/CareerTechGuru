@@ -30,7 +30,8 @@ const EmployerHeader = () => {
     { label: "Application Recieved", path: "recieved-applications" },
   ];
   const ProfileOptions = [
-    { label: "My Profile", path: "view-profile" },
+    { label: "Company Profile", path: "view-profile" },
+    { label: "Account Settings", path: "account-settings" },
     { label: "Notification", path: "view-my-applications" },
     { label: "Contact Support", path: "recieved-applications" },
   ];

@@ -134,6 +134,23 @@ const AuthContextProvider = ({ children }) => {
     }
   };
 
+  const updateUserDetails = async (uid, updateData) => {
+    setLoading(true);
+    try {
+      await setDoc(doc(db, "users", uid), updateData, { merge: true });
+      const userDoc = await getDoc(doc(db, "users", uid));
+      const userData = userDoc.data();
+      setAuthData(token, userData.role, { _id: uid, ...userData });
+      toast.success("Account settings updated successfully");
+      setLoading(false);
+      return { success: true };
+    } catch (error) {
+      toast.error(error.message || "Failed to update account settings");
+      setLoading(false);
+      throw error;
+    }
+  };
+
   const verifyUserEmail = async (otp) => {
     setLoading(true);
     try {
@@ -194,6 +211,7 @@ const AuthContextProvider = ({ children }) => {
       value={{
         AuthenticateUser,
         RegisterUser,
+        updateUserDetails,
         verifyUserEmail,
         forgotPassword,
         verifyOtpForPasswordReset,

@@ -10,6 +10,9 @@ const ViewCategory = React.lazy(
 const EmployerProfile = React.lazy(
   () => import("../shared/employerPages/components/EmployerProfile"),
 );
+const AccountSettings = React.lazy(
+  () => import("../shared/employerPages/components/AccountSettings"),
+);
 const ViewJob = React.lazy(() => import("../features/job/components/ViewJob"));
 
 const EmployeeProfile = React.lazy(
@@ -36,6 +39,10 @@ export const employerRoutes = [
   {
     path: "/view-profile",
     element: <EmployerProfile />,
+  },
+  {
+    path: "/account-settings",
+    element: <AccountSettings />,
   },
 
   // {

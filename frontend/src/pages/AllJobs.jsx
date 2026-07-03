@@ -140,7 +140,7 @@ const AllJobs = () => {
         )}
       </div>
     </div>
-
+  );
 };
 
 export default AllJobs;

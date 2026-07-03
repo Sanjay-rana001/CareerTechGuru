@@ -6,14 +6,15 @@ import { useNavigate } from "react-router-dom";
 
 const AddJobForm = () => {
   const { addJobData } = useJobContext();
-  const userId = JSON.parse(sessionStorage.getItem("data"));
+  const userData = sessionStorage.getItem("data");
+  const userId = userData ? JSON.parse(userData) : {};
   const [selected, setSelected] = useState([]);
   const [tags, setTags] = useState([]);
   const navigate = useNavigate();
 
   const [values, setValues] = useState({
-    adminId: userId.id || "",
-    email: userId.email || "",
+    adminId: userId?._id || userId?.id || "",
+    email: userId?.email || "",
     title: "",
     basicTitle: "",
     category: "",
@@ -54,13 +55,20 @@ const AddJobForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("this is job dat", values);
-      await addJobData(values);
+      const finalValues = {
+        ...values,
+        tags: tags,
+        subCategory: selected,
+        adminId: userId?._id || userId?.id || "",
+        email: userId?.email || "",
+      };
+      console.log("this is job dat", finalValues);
+      await addJobData(finalValues);
       // Redirect after successful submission
       navigate("/view-my-applications");
     } catch (error) {
       console.error("Error adding job:", error);
-      // Handle error here, e.g., show a toast notification
+      alert("Failed to add job: " + error.message);
     }
   };
   const maxDescriptionLength = 500; // Define max length for description

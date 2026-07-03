@@ -1,203 +1,126 @@
 import React, { useEffect, useState } from "react";
 import { GetCountries, GetState, GetCity } from "react-country-state-city";
+import Select from "react-select";
 
-const ProfileFormTwo = ({ prevStep, handleChange, handleSubmit }) => {
+const ProfileFormTwo = ({ prevStep, handleChange, handleSubmit, values }) => {
   const [countriesList, setCountriesList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [cityList, setCityList] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
 
   useEffect(() => {
-    // Fetch countries
     GetCountries().then((result) => {
-      setCountriesList(result);
+      setCountriesList(result.map(c => ({ value: c.name, label: c.name, id: c.id })));
     });
   }, []);
 
   useEffect(() => {
-    // Fetch states when selected country changes
+    const selectedCountry = countriesList.find(c => c.value === values?.country);
     if (selectedCountry) {
       GetState(selectedCountry.id).then((result) => {
-        setStateList(result);
+        setStateList(result.map(s => ({ value: s.name, label: s.name, id: s.id })));
       });
+    } else {
+      setStateList([]);
     }
-  }, [selectedCountry]);
+  }, [values?.country, countriesList]);
 
   useEffect(() => {
-    // Fetch cities when selected state changes
-    if (selectedState) {
+    const selectedCountry = countriesList.find(c => c.value === values?.country);
+    const selectedState = stateList.find(s => s.value === values?.state);
+    if (selectedCountry && selectedState) {
       GetCity(selectedCountry.id, selectedState.id).then((result) => {
-        setCityList(result);
+        setCityList(result.map(city => ({ value: city.name, label: city.name, id: city.id })));
       });
+    } else {
+      setCityList([]);
     }
-  }, [selectedState]);
-
-  const handleCountryChange = (e) => {
-    const selectedCountry = countriesList.find(
-      (country) => country.name === e.target.value,
-    );
-    setSelectedCountry(selectedCountry);
-    handleChange("country")(e); // Capture selected country
-  };
-
-  const handleStateChange = (e) => {
-    const selectedState = stateList.find(
-      (state) => state.name === e.target.value,
-    );
-    setSelectedState(selectedState);
-    handleChange("state")(e); // Capture selected state
-  };
-
-  const handleCityChange = (e) => {
-    const selectedCity = cityList?.find(
-      (state) => state.name === e.target.value,
-    );
-    setSelectedCity(selectedCity);
-    handleChange("city")(e); // Capture selected state
-  };
+  }, [values?.state, stateList, countriesList, values?.country]);
 
   return (
-    <>
-      <div className="container-fluid">
-        <div className="container-sm py-3">
-          <h4 className="text-primary text-2xl">Add company basic details</h4>
-          <div className="row py-3">
-            <div className="col-lg-11">
-              <div className="row items-start justify-start mb-3">
-                <div className="col-3">
-                  <label className="text-[14px]" htmlFor="numberOfEmployee">
-                    Number of Employees <sup className="text-danger">*</sup>
-                  </label>
-                </div>
-                <div className="col">
-                  <input
-                    type="text"
-                    name="companyName"
-                    onChange={handleChange("numberOfEmployee")}
-                    className="form-input text-[14px] rounded-sm"
-                    placeholder="Enter job title"
-                  />
-                </div>
-              </div>
-              <div className="row mb-3">
-                <div className="col-3">
-                  <label htmlFor="country" className="text-[14px]">
-                    Country <sup className="text-danger">*</sup>
-                  </label>
-                </div>
-                <div className="col">
-                  <select className="form-input" onChange={handleCountryChange}>
-                    <option value="">Choose country</option>
-                    {countriesList.map((country, idx) => (
-                      <option key={idx} value={country.name}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="row mb-3">
-                <div className="col-3">
-                  <label htmlFor="state" className="text-[14px]">
-                    State <sup className="text-danger">*</sup>
-                  </label>
-                </div>
-                <div className="col">
-                  <select className="form-input" onChange={handleStateChange}>
-                    <option value="">Choose state</option>
-                    {stateList.map((state, idx) => (
-                      <option key={idx} value={state.name}>
-                        {state.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="row mb-3">
-                <div className="col-3">
-                  <label htmlFor="city" className="text-[14px]">
-                    City <sup className="text-danger">*</sup>
-                  </label>
-                </div>
-                <div className="col">
-                  <select className="form-input" onChange={handleCityChange}>
-                    <option value="">Choose city</option>
-                    {cityList.map((city, idx) => (
-                      <option key={idx} value={city.name}>
-                        {city.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="row mb-3">
-                <div className="col-3">
-                  <label htmlFor="pincode" className="text-[14px]">
-                    Pincode <sup className="text-danger">*</sup>
-                  </label>
-                </div>
-                <div className="col">
-                  <input
-                    type="text"
-                    name="pincode"
-                    onChange={handleChange("pincode")}
-                    className="form-input text-[14px] rounded-sm"
-                    placeholder="Enter pincode"
-                  />
-                </div>
-              </div>
-              <div className="row mb-3">
-                <div className="col-3">
-                  <label htmlFor="companyAddress" className="text-[14px]">
-                    Company Address <sup className="text-danger">*</sup>
-                  </label>
-                </div>
-                <div className="col">
-                  <input
-                    type="text"
-                    name="companyAddress"
-                    onChange={handleChange("companyAddress")}
-                    className="form-input text-[14px] rounded-sm"
-                    placeholder="Enter company address"
-                  />
-                </div>
-              </div>
-              <div className="row mb-3">
-                <div className="col-3">
-                  <label htmlFor="startedAt" className="text-[14px]">
-                    Company Start from <sup className="text-danger">*</sup>
-                  </label>
-                </div>
-                <div className="col">
-                  <input
-                    type="date"
-                    name="startedAt"
-                    className="form-input"
-                    onChange={handleChange("startedAt")}
-                  />
-                </div>
-              </div>
-              <div className="form-group flex items-center gap-3">
-                <button
-                  onClick={handleSubmit}
-                  className="btn bg-prime w-25 text-light"
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={prevStep}
-                  className="btn btn-secondary text-light w-25"
-                >
-                  Back
-                </button>
-              </div>
+    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+          <h4 className="text-2xl font-bold text-white mb-0">Company Location & Size</h4>
+          <p className="text-blue-100 mt-1 text-sm mb-0">Step 2 of 2: Finalize your employer profile</p>
+        </div>
+        
+        <div className="p-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div>
+              <label htmlFor="numberOfEmployee" className="block text-sm font-semibold text-gray-700 mb-2">Number of Employees <span className="text-red-500">*</span></label>
+              <input type="text" onChange={handleChange("numberOfEmployee")} value={values?.numberOfEmployee || ''} placeholder="e.g. 50-100" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm outline-none" />
             </div>
+
+            <div>
+              <label htmlFor="startedAt" className="block text-sm font-semibold text-gray-700 mb-2">Company Started From <span className="text-red-500">*</span></label>
+              <input type="date" onChange={handleChange("startedAt")} value={values?.startedAt || ''} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm outline-none" />
+            </div>
+
+            <div className="text-sm">
+              <label htmlFor="country" className="block font-semibold text-gray-700 mb-2">Country <span className="text-red-500">*</span></label>
+              <Select 
+                options={countriesList} 
+                value={countriesList.find(opt => opt.value === values?.country) || null} 
+                onChange={(option) => handleChange("country")({ target: { value: option?.value || "" } })} 
+                isClearable 
+                placeholder="Select country..." 
+              />
+            </div>
+
+            <div className="text-sm">
+              <label htmlFor="state" className="block font-semibold text-gray-700 mb-2">State <span className="text-red-500">*</span></label>
+              <Select 
+                options={stateList} 
+                value={stateList.find(opt => opt.value === values?.state) || null} 
+                onChange={(option) => handleChange("state")({ target: { value: option?.value || "" } })} 
+                isClearable 
+                placeholder="Select state..." 
+                isDisabled={!values?.country}
+              />
+            </div>
+
+            <div className="text-sm">
+              <label htmlFor="city" className="block font-semibold text-gray-700 mb-2">City <span className="text-red-500">*</span></label>
+              <Select 
+                options={cityList} 
+                value={cityList.find(opt => opt.value === values?.city) || null} 
+                onChange={(option) => handleChange("city")({ target: { value: option?.value || "" } })} 
+                isClearable 
+                placeholder="Select city..." 
+                isDisabled={!values?.state}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="pincode" className="block text-sm font-semibold text-gray-700 mb-2">Pincode <span className="text-red-500">*</span></label>
+              <input type="text" onChange={handleChange("pincode")} value={values?.pincode || ''} placeholder="e.g. 110001" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm outline-none" />
+            </div>
+
+            <div className="md:col-span-2">
+              <label htmlFor="companyAddress" className="block text-sm font-semibold text-gray-700 mb-2">Complete Address <span className="text-red-500">*</span></label>
+              <input type="text" onChange={handleChange("companyAddress")} value={values?.companyAddress || ''} placeholder="Street, Building No, Landmark" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm outline-none" />
+            </div>
+
           </div>
         </div>
+
+        <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex items-center justify-between">
+          <button
+            onClick={(e) => { e.preventDefault(); prevStep(); }}
+            className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-all"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-8 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm shadow-blue-200 transition-all"
+          >
+            Submit Profile
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

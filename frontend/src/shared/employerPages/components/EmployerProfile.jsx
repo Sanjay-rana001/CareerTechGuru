@@ -6,7 +6,7 @@ import UpdateInput from "../../../components/modal/UpdateInput";
 import { ModalBox } from "../../../components";
 import { Link } from "react-router-dom";
 import EmployerProfileForm from "../EmployerProfileForm";
-import { storage, db, auth } from "../../../../firebase";
+import { storage, db, auth } from "../../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
 

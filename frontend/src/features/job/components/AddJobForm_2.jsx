@@ -36,8 +36,7 @@ const AddJobForm_2 = ({
       setIsUploading(true);
       const { storage } = await import("../../../../firebase");
       const { ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
-      
-      const fileRef = ref(storage, \`companyLogos/\${Date.now()}_\${file.name}\`);
+      const fileRef = ref(storage, `companyLogos/${Date.now()}_${file.name}`);
       await uploadBytes(fileRef, file);
       const downloadUrl = await getDownloadURL(fileRef);
       

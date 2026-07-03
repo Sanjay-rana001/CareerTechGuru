@@ -59,33 +59,37 @@ const AllJobs = () => {
     getApplicationCategory();
   }, []);
 
-  if (isSearchLoading) {
-    return (
-      <div className="min-h-[80vh] bg-slate-50 py-10 flex justify-center items-center">
-        <div className="text-slate-500 font-medium text-lg">
-          Searching jobs...
-        </div>
-      </div>
-    );
-  }
-
-  if (!searchResult || searchResult.length === 0) {
-    return (
-      <div className="min-h-[80vh] bg-slate-50 py-10">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="mb-6 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-              Find Jobs
-            </h1>
+  return (
+    <div className="bg-slate-50 min-h-screen py-10">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Search Header - Always visible to prevent remounting loops */}
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+            Find Jobs
+          </h1>
+          {(!searchResult || searchResult.length === 0) && !isSearchLoading && (
             <button
               onClick={handleBackClick}
               className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-sm rounded-lg border-0 transition-colors"
             >
               Clear Search
             </button>
-          </div>
+          )}
+        </div>
+        
+        <div className="mb-6">
           <Search categories={sections} />
+        </div>
 
+        {/* Loading State */}
+        {isSearchLoading ? (
+          <div className="mt-12 flex justify-center items-center py-10">
+            <div className="text-slate-500 font-medium text-lg">
+              Searching jobs...
+            </div>
+          </div>
+        ) : (!searchResult || searchResult.length === 0) ? (
+          /* Empty State */
           <div className="mt-12 bg-white border border-slate-200 rounded-2xl p-10 text-center shadow-sm">
             <h3 className="text-xl font-semibold text-slate-800 mb-2">
               No Jobs Found
@@ -101,56 +105,42 @@ const AllJobs = () => {
               Show All Jobs
             </button>
           </div>
-        </div>
-      </div>
-    );
-  }
+        ) : (
+          /* Results State */
+          <>
+            <div className="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 px-6 py-4 rounded-xl shadow-sm gap-4 mb-6">
+              <h3 className="text-sm font-semibold text-slate-600 mb-0">
+                Results &mdash; {totalJobsCount} jobs found
+              </h3>
+              <p className="text-xs text-slate-400">
+                Showing {searchResult.length} of {totalJobsCount}
+              </p>
+            </div>
 
-  return (
-    <div className="bg-slate-50 min-h-screen py-10">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Search Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-            Find Jobs
-          </h1>
-          <Search categories={sections} />
-        </div>
+            <div className="grid grid-cols-1 gap-4">
+              <JobCardTwo data={searchResult} />
+            </div>
 
-        {/* Results Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-center bg-white border border-slate-200 px-6 py-4 rounded-xl shadow-sm gap-4 mb-6">
-          <h3 className="text-sm font-semibold text-slate-600 mb-0">
-            Results &mdash; {totalJobsCount} jobs found
-          </h3>
-          <p className="text-xs text-slate-400">
-            Showing {searchResult.length} of {totalJobsCount}
-          </p>
-        </div>
-
-        {/* Jobs List Grid */}
-        <div className="grid grid-cols-1 gap-4">
-          <JobCardTwo data={searchResult} />
-        </div>
-
-        {/* Load More Button */}
-        {lastVisibleDoc && (
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={fetchNextPage}
-              disabled={isFetchingMore}
-              className={`px-8 py-3 rounded-lg font-medium text-sm transition-colors ${
-                isFetchingMore
-                  ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                  : "bg-white border-2 border-[#2563EB] text-[#2563EB] hover:bg-blue-50"
-              }`}
-            >
-              {isFetchingMore ? "Loading..." : "Load More Jobs"}
-            </button>
-          </div>
+            {lastVisibleDoc && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={fetchNextPage}
+                  disabled={isFetchingMore}
+                  className={`px-8 py-3 rounded-lg font-medium text-sm transition-colors ${
+                    isFetchingMore
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-white border-2 border-[#2563EB] text-[#2563EB] hover:bg-blue-50"
+                  }`}
+                >
+                  {isFetchingMore ? "Loading..." : "Load More Jobs"}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
-  );
+
 };
 
 export default AllJobs;

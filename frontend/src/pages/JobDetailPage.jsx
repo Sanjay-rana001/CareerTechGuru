@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useJobContext } from "../context";
+import { useJobContext, useAdminContext } from "../context";
 import { useParams, useNavigate } from "react-router-dom";
 import { VscLinkExternal } from "react-icons/vsc";
 import { IoShareSocialSharp } from "react-icons/io5";
@@ -11,9 +11,11 @@ import { useQuery } from "@tanstack/react-query";
 
 const JobDetailPage = () => {
   const { getApplicationsByJobId, getAllApplications } = useJobContext();
+  const { createJobApplication } = useAdminContext();
   const { title } = useParams();
   const navigate = useNavigate();
   const [isConfirmBoxVisible, setConfirmBoxVisible] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
   // React Query refactor: caching the applications list and the specific job details
   const { data: allApplications, isLoading: isLoadingAll } = useQuery({
@@ -40,6 +42,27 @@ const JobDetailPage = () => {
   const handleConfirm = () => {
     window.open(jobData?.jobUrl, "_blank", "noopener,noreferrer");
     setConfirmBoxVisible(false);
+  };
+
+  const handleApply = async () => {
+    if (!jobData) return;
+    try {
+      setIsApplying(true);
+      
+      const applicationData = {
+        jobId: jobData._id,
+        sellerId: jobData.adminId || jobData.postedBy,
+        title: jobData.title,
+        companyName: jobData.companyName,
+        category: jobData.category,
+      };
+
+      await createJobApplication(applicationData);
+    } catch (error) {
+      console.error("Error applying to job:", error);
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   if (loading) {
@@ -219,8 +242,12 @@ const JobDetailPage = () => {
                   Apply on Company Site
                 </button>
               ) : (
-                <button className="px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm rounded-lg border-0 transition-colors shadow-sm">
-                  Apply now
+                <button 
+                  onClick={handleApply}
+                  disabled={isApplying}
+                  className={`px-6 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm rounded-lg border-0 transition-colors shadow-sm ${isApplying ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  {isApplying ? "Applying..." : "Apply now"}
                 </button>
               )}
             </div>

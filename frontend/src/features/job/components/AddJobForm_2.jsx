@@ -15,7 +15,7 @@ const AddJobForm_2 = ({
   }, [values.isReferenceJob]);
 
   useEffect(() => {
-    import("../../../../utils/locationUtils").then((module) => {
+    import("../../../utils/locationUtils").then((module) => {
       setLocationOptions(module.getGlobalLocationOptions());
     });
   }, []);

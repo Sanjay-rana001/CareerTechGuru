@@ -17,9 +17,4 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Clear the cache to prevent "client is offline" errors from persisting
-clearIndexedDbPersistence(db).catch((err) => {
-  console.error("Failed to clear Firebase persistence cache:", err);
-});
-
 export const storage = getStorage(app);

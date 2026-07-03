@@ -171,37 +171,40 @@ const Home = () => {
       </section>
 
       {/* Top Companies Marquee */}
-      {companyListDetails && companyListDetails.length > 0 && (
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center md:text-left">
-            <h3 className="text-xs font-semibold text-[#2563EB] tracking-wider uppercase mb-2">
-              Top companies hiring from us
-            </h3>
-            <p className="text-lg text-slate-500">
-              To find the best person in the world, not the best person in their
-              zipcode.
-            </p>
-          </div>
-          <div className="py-4 border-y border-slate-100 bg-slate-50/50">
-            <Marquee speed={40} gradient={false}>
-              <div className="flex gap-8 items-center py-2 px-4">
-                {companyListDetails.map((items, idx) => (
-                  <div
-                    key={items.id || idx}
-                    className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm w-36 h-20 flex items-center justify-center"
-                  >
-                    <img
-                      src={items?.profilePicture}
-                      alt="Company Logo"
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
-            </Marquee>
-          </div>
-        </section>
-      )}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center md:text-left">
+          <h3 className="text-xs font-semibold text-[#2563EB] tracking-wider uppercase mb-2">
+            Top companies hiring from us
+          </h3>
+          <p className="text-lg text-slate-500">
+            To find the best person in the world, not the best person in their
+            zipcode.
+          </p>
+        </div>
+        <div className="py-4 border-y border-slate-100 bg-slate-50/50">
+          <Marquee speed={40} gradient={false}>
+            <div className="flex gap-8 items-center py-2 px-4">
+              {[
+                "google", "microsoft", "amazon", "apple", "meta", 
+                "netflix", "tesla", "spotify", "airbnb", "uber", 
+                "x", "ibm", "intel", "nvidia", "oracle", 
+                "adobe", "salesforce", "samsung", "sony", "paypal"
+              ].map((company, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm w-36 h-20 flex items-center justify-center overflow-hidden"
+                >
+                  <img
+                    src={`/companies/${company}.svg`}
+                    alt={`${company} Logo`}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+          </Marquee>
+        </div>
+      </section>
 
       {/* How it Works Section */}
       <section className="py-20 bg-slate-900 text-white">

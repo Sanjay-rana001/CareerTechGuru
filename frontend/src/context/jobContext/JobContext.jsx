@@ -163,17 +163,19 @@ const JobContextProvider = ({ children }) => {
   const getCompanyList = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "jobs"));
-      const companies = new Set();
+      const companies = new Map();
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        if (data.company) {
-          companies.add(data.company);
+        if (data.company && !companies.has(data.company)) {
+          companies.set(data.company, {
+            id: data.company,
+            label: data.company,
+            value: data.company,
+            profilePicture: data.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+          });
         }
       });
-      return Array.from(companies).map((company) => ({
-        label: company,
-        value: company,
-      }));
+      return Array.from(companies.values());
     } catch (error) {
       console.error("Error fetching company list:", error);
       return [];

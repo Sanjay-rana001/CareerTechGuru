@@ -25,10 +25,10 @@ const Search = ({ categories }) => {
 
   const fetchJobLocations = async () => {
     try {
-      const result = await getJobSingleDetail();
-      setLocations(result?.data || []);
+      const { getGlobalLocationOptions } = await import("../../utils/locationUtils");
+      setLocations(getGlobalLocationOptions());
     } catch (error) {
-      console.error("Error fetching job locations:", error);
+      console.error("Error loading location options:", error);
     }
   };
 

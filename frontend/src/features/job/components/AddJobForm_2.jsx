@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import Select from "react-select";
 const AddJobForm_2 = ({
   nextStep,
   prevStep,
@@ -8,10 +8,17 @@ const AddJobForm_2 = ({
   values,
 }) => {
   const [isReferenceJob, setIsReferenceJob] = useState(values.isReferenceJob);
+  const [locationOptions, setLocationOptions] = useState([]);
 
   useEffect(() => {
     setIsReferenceJob(values.isReferenceJob);
   }, [values.isReferenceJob]);
+
+  useEffect(() => {
+    import("../../../../utils/locationUtils").then((module) => {
+      setLocationOptions(module.getGlobalLocationOptions());
+    });
+  }, []);
 
   const handleRadioChange = (event) => {
     const value = event.target.value === "yes";
@@ -203,13 +210,20 @@ const AddJobForm_2 = ({
                   </label>
                 </div>
                 <div className="col">
-                  <input
-                    type="text"
-                    name="jobLocation"
-                    onChange={handleChange("jobLocation")}
-                    value={values.jobLocation}
-                    placeholder="Company website"
-                    className="form-input"
+                  <Select
+                    options={locationOptions}
+                    value={
+                      locationOptions?.find(
+                        (option) => option?.value === values.jobLocation,
+                      ) || null
+                    }
+                    onChange={(selectedOption) =>
+                      handleChange("jobLocation")({
+                        target: { value: selectedOption?.value || "" },
+                      })
+                    }
+                    isClearable
+                    placeholder="Select location..."
                   />
                 </div>
               </div>

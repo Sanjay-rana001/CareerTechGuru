@@ -66,14 +66,9 @@ const AddJobForm_1 = ({
     }
 
     if (selected.length === 0) {
-      errors.subCategory = "At least one skill is required";
+      errors.subCategory = "Please type a skill and press 'Enter' to add it";
       isValid = false;
     }
-
-    // if (!values.shortDescription.trim()) {
-    //     errors.shortDescription = "Short description is required";
-    //     isValid = false;
-    // }
 
     if (!values.description.trim()) {
       errors.description = "Description is required";
@@ -81,7 +76,7 @@ const AddJobForm_1 = ({
     }
 
     if (tags.length === 0) {
-      errors.tags = "At least one tag is required";
+      errors.tags = "Please type a tag and press 'Enter' to add it";
       isValid = false;
     }
 
@@ -234,6 +229,9 @@ const AddJobForm_1 = ({
                     value={values.shortDescription}
                     onChange={handleChange("shortDescription")}
                   />
+                  <p className="text-slate-500 text-[12px] mt-1">
+                    Maximum 300 characters
+                  </p>
                   {formError.shortDescription && (
                     <p className="text-danger text-sm">
                       {formError.shortDescription}
@@ -241,8 +239,6 @@ const AddJobForm_1 = ({
                   )}
                 </div>
               </div>
-              <p class="character">Not more than 0 - 300 characters</p>
-              <br />
               <MediaQuery query="(min-width: 787px)">
                 <div className="row mb-3">
                   <div className="col-3">

@@ -7,11 +7,12 @@ import coverimg from "../../../assets/logo.jpeg";
 import EmailVerify from "./EmailVerify";
 import { CircularLoader } from "../../../components";
 import { useBrandContext } from "../../../context";
+import { FcGoogle } from "react-icons/fc";
 
 const Signup = () => {
   const { siteConfig } = useBrandContext();
   const [step, setStep] = useState(1);
-  const { RegisterUser, loading } = useAuthContext();
+  const { RegisterUser, signInWithGoogle, loading } = useAuthContext();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -82,12 +83,40 @@ const Signup = () => {
           {/* Form Step Render */}
           <div className="mt-4">
             {step === 1 && (
-              <FormStepOne
-                nextStep={nextStep}
-                handleInputChange={handleInputData}
-                formData={formData}
-                handleSubmit={handleSubmit}
-              />
+              <>
+                <FormStepOne
+                  nextStep={nextStep}
+                  handleInputChange={handleInputData}
+                  formData={formData}
+                  handleSubmit={handleSubmit}
+                />
+                
+                <div className="relative flex items-center justify-center w-full my-5">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-2 bg-white text-slate-400 font-semibold uppercase tracking-wide">Or sign up with</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await signInWithGoogle();
+                      navigate("/");
+                    } catch (error) {
+                      console.error("Google Sign-Up Error:", error);
+                    }
+                  }}
+                  className="w-full bg-white hover:bg-slate-50 text-slate-700 font-semibold py-2.5 rounded-lg border border-slate-200 shadow-sm transition-colors text-sm flex items-center justify-center gap-2"
+                  disabled={loading}
+                >
+                  <FcGoogle size={20} />
+                  Google
+                </button>
+              </>
             )}
             {step === 2 && (
               <FormStepTwo

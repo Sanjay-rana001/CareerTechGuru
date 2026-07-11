@@ -24,9 +24,18 @@ const EmployerProfile = () => {
 
   const getAdminProfileDetails = async () => {
     try {
-      const adminData = await getAdminsDetailsByAdminId(user?.id, "Employer");
-      if (adminData) {
-        setData(adminData);
+      const adminId = user?._id || user?.uid || user?.id;
+      if (!adminId) {
+        console.warn("No user ID found to fetch profile details.");
+        setLoading(false);
+        return;
+      }
+
+      const adminData = await getAdminsDetailsByAdminId(adminId, "Employer");
+      if (adminData && typeof adminData.exists === 'function' && adminData.exists()) {
+        setData(adminData.data());
+      } else if (adminData && !adminData.exists) {
+        setData(adminData); // Fallback if data is already unwrapped
       }
       setLoading(false);
     } catch (error) {

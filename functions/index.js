@@ -49,10 +49,22 @@ exports.setCustomUserRole = functions.https.onCall(async (data, context) => {
     );
   }
 
-  // Security check: Only allow setting role if they don't already have one, or if they are an admin.
-  // In a robust system, you would check if context.auth.token.admin === true.
-
   const { targetUid, role } = data; // role should be 'employer' or 'employee'
+
+  if (!targetUid || typeof targetUid !== "string") {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "The function must be called with a valid targetUid.",
+    );
+  }
+
+  // Security check: Ensure the user is setting their own role, or they are an admin
+  if (context.auth.uid !== targetUid && !context.auth.token.admin) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You do not have permission to set this role.",
+    );
+  }
 
   if (role !== "employer" && role !== "employee") {
     throw new functions.https.HttpsError(

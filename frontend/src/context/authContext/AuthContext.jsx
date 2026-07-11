@@ -6,6 +6,8 @@ import {
   signOut,
   sendPasswordResetEmail,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import {
   doc,
@@ -95,6 +97,61 @@ const AuthContextProvider = ({ children }) => {
       return { token, user: { _id: user.uid, ...userData } };
     } catch (error) {
       toast.error(error.message || "Invalid credentials. Please try again.");
+      setLoading(false);
+      throw error;
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const token = await user.getIdToken();
+
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      let userData;
+      if (!userDoc.exists()) {
+        // New user registration via Google
+        userData = {
+          firstName: user.displayName?.split(" ")[0] || "",
+          lastName: user.displayName?.split(" ").slice(1).join(" ") || "",
+          email: user.email,
+          mobile: user.phoneNumber || "",
+          username: user.email.split("@")[0],
+          country: "",
+          role: "user", // Default role
+          resumeUrl: "",
+          profilePictureUrl: user.photoURL || "",
+        };
+        await setDoc(userDocRef, userData);
+
+        // Initialize the employee profile document for the new user
+        await setDoc(doc(db, "profiles", user.email), {
+          uid: user.uid,
+          email: user.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          mobile: userData.mobile,
+          resumeUrl: userData.resumeUrl,
+          profilePictureUrl: userData.profilePictureUrl,
+          createdAt: new Date().toISOString(),
+        });
+      } else {
+        // Existing user login
+        userData = userDoc.data();
+      }
+
+      setAuthData(token, userData.role, { _id: user.uid, ...userData });
+      toast.success("Signed in with Google successfully!");
+      setLoading(false);
+      return { token, user: { _id: user.uid, ...userData } };
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+      toast.error(error.message || "Failed to sign in with Google.");
       setLoading(false);
       throw error;
     }
@@ -226,6 +283,7 @@ const AuthContextProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         AuthenticateUser,
+        signInWithGoogle,
         RegisterUser,
         updateUserDetails,
         verifyUserEmail,

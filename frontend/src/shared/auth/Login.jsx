@@ -4,10 +4,11 @@ import { useAuthContext } from "../../context";
 import coverImg from "../../assets/logo.jpeg";
 import { TextInput } from "../../components";
 import { useBrandContext } from "../../context";
+import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
   const { siteConfig } = useBrandContext();
-  const { AuthenticateUser, loading } = useAuthContext();
+  const { AuthenticateUser, signInWithGoogle, loading } = useAuthContext();
   const navigate = useNavigate();
   const [loginCredentials, setLoginCredentials] = useState({
     email: "",
@@ -145,6 +146,35 @@ const Login = () => {
                 disabled={loading}
               >
                 {loading ? "Please wait..." : "Login"}
+              </button>
+
+              <div className="relative flex items-center justify-center w-full my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white text-slate-400 font-semibold uppercase tracking-wide">Or</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await signInWithGoogle();
+                    navigate("/");
+                  } catch (error) {
+                    setErrorMessage(error.message);
+                    setTimeout(() => {
+                      setErrorMessage("");
+                    }, 3000);
+                  }
+                }}
+                className="w-full bg-white hover:bg-slate-50 text-slate-700 font-semibold py-2.5 rounded-lg border border-slate-200 shadow-sm transition-colors text-sm flex items-center justify-center gap-2"
+                disabled={loading}
+              >
+                <FcGoogle size={20} />
+                Sign in with Google
               </button>
 
               <button
